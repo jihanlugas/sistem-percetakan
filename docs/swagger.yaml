@@ -1,0 +1,119 @@
+definitions:
+  request.Signin:
+    properties:
+      passwd:
+        example: "123456"
+        maxLength: 200
+        type: string
+      username:
+        example: admindemo
+        type: string
+    required:
+    - passwd
+    - username
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      payload:
+        type: object
+      status:
+        type: boolean
+    type: object
+host: localhost:1323
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  title: Swagger sistem percetakan API
+  version: "1.0"
+paths:
+  /auth/init:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Authentication
+  /auth/refresh-token:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Authentication
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.Signin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      tags:
+      - Authentication
+  /auth/sign-out:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      tags:
+      - Authentication
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
