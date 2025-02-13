@@ -78,8 +78,8 @@ func (r repository) Delete(conn *gorm.DB, tUsercompany model.Usercompany) error 
 	return conn.Delete(&tUsercompany).Error
 }
 
-func (r repository) Page(conn *gorm.DB, req request.PageUsercompany) (tUsercompanies []model.UsercompanyView, count int64, err error) {
-	query := conn.Model(&tUsercompanies)
+func (r repository) Page(conn *gorm.DB, req request.PageUsercompany) (vUsercompanies []model.UsercompanyView, count int64, err error) {
+	query := conn.Model(&vUsercompanies)
 	if req.CompanyID != "" {
 		query = query.Where("company_id = ?", req.CompanyID)
 	}
@@ -89,7 +89,7 @@ func (r repository) Page(conn *gorm.DB, req request.PageUsercompany) (tUsercompa
 
 	err = query.Count(&count).Error
 	if err != nil {
-		return tUsercompanies, count, err
+		return vUsercompanies, count, err
 	}
 
 	if req.SortField != "" {
@@ -97,14 +97,17 @@ func (r repository) Page(conn *gorm.DB, req request.PageUsercompany) (tUsercompa
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&tUsercompanies).Error
-	if err != nil {
-		return tUsercompanies, count, err
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
 	}
 
-	return tUsercompanies, count, err
+	err = query.Find(&vUsercompanies).Error
+	if err != nil {
+		return vUsercompanies, count, err
+	}
+
+	return vUsercompanies, count, err
 }
 
 func NewRepository() Repository {

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -15,6 +17,7 @@ type Repository interface {
 	Update(conn *gorm.DB, tPayment model.Payment) error
 	Save(conn *gorm.DB, tPayment model.Payment) error
 	Delete(conn *gorm.DB, tPayment model.Payment) error
+	DeleteByOrderId(conn *gorm.DB, id string) error
 	Page(conn *gorm.DB, req request.PagePayment) (vPayments []model.PaymentView, count int64, err error)
 }
 
@@ -57,15 +60,19 @@ func (r repository) Delete(conn *gorm.DB, tPayment model.Payment) error {
 	return conn.Delete(&tPayment).Error
 }
 
+func (r repository) DeleteByOrderId(conn *gorm.DB, id string) error {
+	return conn.Where("order_id = ? ", id).Delete(&model.Payment{}).Error
+}
+
 func (r repository) Page(conn *gorm.DB, req request.PagePayment) (vPayments []model.PaymentView, count int64, err error) {
 	query := conn.Model(&vPayments)
 
 	// preloads
-	if req.Company {
-		query = query.Preload("Company")
-	}
-	if req.Order {
-		query = query.Preload("Order")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadPayment) {
+			query = query.Preload(preload)
+		}
 	}
 
 	// query
@@ -80,9 +87,6 @@ func (r repository) Page(conn *gorm.DB, req request.PagePayment) (vPayments []mo
 	}
 	if req.Description != "" {
 		query = query.Where("description ILIKE ?", "%"+req.Description+"%")
-	}
-	if req.IsDonePayment != nil {
-		query = query.Where("is_done_payment = ?", req.IsDonePayment)
 	}
 	if req.CompanyName != "" {
 		query = query.Where("company_name ILIKE ?", "%"+req.CompanyName+"%")
@@ -104,9 +108,12 @@ func (r repository) Page(conn *gorm.DB, req request.PagePayment) (vPayments []mo
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vPayments).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vPayments).Error
 	if err != nil {
 		return vPayments, count, err
 	}

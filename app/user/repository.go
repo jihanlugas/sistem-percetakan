@@ -12,11 +12,11 @@ type Repository interface {
 	GetById(conn *gorm.DB, id string) (tUser model.User, err error)
 	GetByUsername(conn *gorm.DB, username string) (tUser model.User, err error)
 	GetByEmail(conn *gorm.DB, email string) (tUser model.User, err error)
-	GetByNoHp(conn *gorm.DB, noHp string) (tUser model.User, err error)
+	GetByPhoneNumber(conn *gorm.DB, phoneNumber string) (tUser model.User, err error)
 	GetViewById(conn *gorm.DB, id string) (vUser model.UserView, err error)
 	GetViewByUsername(conn *gorm.DB, username string) (vUser model.UserView, err error)
 	GetViewByEmail(conn *gorm.DB, email string) (vUser model.UserView, err error)
-	GetViewByNoHp(conn *gorm.DB, noHp string) (vUser model.UserView, err error)
+	GetViewByPhoneNumber(conn *gorm.DB, phoneNumber string) (vUser model.UserView, err error)
 	Create(conn *gorm.DB, tUser model.User) error
 	Update(conn *gorm.DB, tUser model.User) error
 	Save(conn *gorm.DB, tUser model.User) error
@@ -42,8 +42,8 @@ func (r repository) GetByEmail(conn *gorm.DB, email string) (tUser model.User, e
 	return tUser, err
 }
 
-func (r repository) GetByNoHp(conn *gorm.DB, noHp string) (tUser model.User, err error) {
-	err = conn.Where("no_hp = ? ", utils.FormatPhoneTo62(noHp)).First(&tUser).Error
+func (r repository) GetByPhoneNumber(conn *gorm.DB, phoneNumber string) (tUser model.User, err error) {
+	err = conn.Where("no_hp = ? ", utils.FormatPhoneTo62(phoneNumber)).First(&tUser).Error
 	return tUser, err
 }
 
@@ -62,8 +62,8 @@ func (r repository) GetViewByEmail(conn *gorm.DB, email string) (vUser model.Use
 	return vUser, err
 }
 
-func (r repository) GetViewByNoHp(conn *gorm.DB, noHp string) (vUser model.UserView, err error) {
-	err = conn.Where("no_hp = ? ", noHp).First(&vUser).Error
+func (r repository) GetViewByPhoneNumber(conn *gorm.DB, phoneNumber string) (vUser model.UserView, err error) {
+	err = conn.Where("no_hp = ? ", phoneNumber).First(&vUser).Error
 	return vUser, err
 }
 
@@ -85,14 +85,19 @@ func (r repository) Delete(conn *gorm.DB, tUser model.User) error {
 
 func (r repository) Page(conn *gorm.DB, req request.PageUser) (vUsers []model.UserView, count int64, err error) {
 	query := conn.Model(&vUsers)
+
+	if req.CompanyID != "" {
+		query = query.Where("company_id = ?", req.CompanyID)
+	}
+
 	if req.Email != "" {
 		query = query.Where("email ILIKE ?", "%"+req.Email+"%")
 	}
 	if req.Username != "" {
 		query = query.Where("username ILIKE ?", "%"+req.Username+"%")
 	}
-	if req.NoHp != "" {
-		query = query.Where("no_hp ILIKE ?", "%"+utils.FormatPhoneTo62(req.NoHp)+"%")
+	if req.PhoneNumber != "" {
+		query = query.Where("no_hp ILIKE ?", "%"+utils.FormatPhoneTo62(req.PhoneNumber)+"%")
 	}
 	if req.Fullname != "" {
 		query = query.Where("fullname ILIKE ?", "%"+req.Fullname+"%")
@@ -108,9 +113,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageUser) (vUsers []model.Us
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "fullname", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vUsers).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vUsers).Error
 	if err != nil {
 		return vUsers, count, err
 	}

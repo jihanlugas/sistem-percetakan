@@ -6,6 +6,18 @@ import (
 	"time"
 )
 
+var PreloadOrder = []string{
+	"Company",
+	"Customer",
+	"Designs",
+	"Prints",
+	"Prints.Paper",
+	"Finishings",
+	"Others",
+	"Orderphases",
+	"Payments",
+}
+
 func (m *Order) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
@@ -24,6 +36,6 @@ func (m *Order) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Order) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Order) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}

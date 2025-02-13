@@ -20,7 +20,7 @@ func (p *Paging) GetPage() int {
 }
 
 func (p *Paging) GetLimit() int {
-	if p.Limit <= config.DefaultDataPerPage {
+	if p.Limit == 0 {
 		return config.DefaultDataPerPage
 	} else {
 		return p.Limit

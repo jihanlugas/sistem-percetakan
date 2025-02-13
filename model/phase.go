@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+var PreloadPhase = []string{
+	"Company",
+}
+
 func (m *Phase) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
@@ -24,6 +28,6 @@ func (m *Phase) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Phase) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Phase) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}

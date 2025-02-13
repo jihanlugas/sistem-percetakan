@@ -1,4 +1,259 @@
 definitions:
+  request.AddPayment:
+    properties:
+      amount:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - amount
+    - name
+    type: object
+  request.AddPhase:
+    properties:
+      orderphaseId:
+        type: string
+    required:
+    - orderphaseId
+    type: object
+  request.CreateCustomer:
+    properties:
+      address:
+        type: string
+      companyId:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phoneNumber:
+        type: string
+    required:
+    - address
+    - companyId
+    - description
+    - email
+    - name
+    type: object
+  request.CreateDesign:
+    properties:
+      companyId:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      orderId:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateFinishing:
+    properties:
+      companyId:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      orderId:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateOrder:
+    properties:
+      companyId:
+        type: string
+      customerId:
+        type: string
+      description:
+        type: string
+      designs:
+        items:
+          $ref: '#/definitions/request.CreateOrderDesign'
+        type: array
+      finishings:
+        items:
+          $ref: '#/definitions/request.CreateOrderFinishing'
+        type: array
+      name:
+        type: string
+      newCustomer:
+        type: string
+      newCustomerPhone:
+        type: string
+      orderphaseId:
+        type: string
+      others:
+        items:
+          $ref: '#/definitions/request.CreateOrderOther'
+        type: array
+      prints:
+        items:
+          $ref: '#/definitions/request.CreateOrderPrint'
+        type: array
+    required:
+    - companyId
+    - name
+    type: object
+  request.CreateOrderDesign:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateOrderFinishing:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateOrderOther:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateOrderPrint:
+    properties:
+      description:
+        type: string
+      isDuplex:
+        type: boolean
+      name:
+        type: string
+      pageCount:
+        type: integer
+      paperId:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreateOther:
+    properties:
+      companyId:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      orderId:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.CreatePaper:
+    properties:
+      companyId:
+        type: string
+      defaultPrice:
+        type: integer
+      defaultPriceDuplex:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  request.CreatePayment:
+    properties:
+      amount:
+        type: integer
+      companyId:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      orderId:
+        type: string
+    required:
+    - amount
+    - companyId
+    - name
+    - orderId
+    type: object
+  request.CreatePrint:
+    properties:
+      companyId:
+        type: string
+      description:
+        type: string
+      isDuplex:
+        type: boolean
+      name:
+        type: string
+      orderId:
+        type: string
+      paperId:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
   request.Signin:
     properties:
       passwd:
@@ -11,6 +266,124 @@ definitions:
     required:
     - passwd
     - username
+    type: object
+  request.UpdateCustomer:
+    properties:
+      address:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      phoneNumber:
+        type: string
+    required:
+    - address
+    - description
+    - email
+    - name
+    type: object
+  request.UpdateDesign:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.UpdateFinishing:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.UpdateOrder:
+    properties:
+      description:
+        type: string
+      isDone:
+        type: boolean
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  request.UpdateOther:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
+    type: object
+  request.UpdatePaper:
+    properties:
+      defaultPrice:
+        type: integer
+      defaultPriceDuplex:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  request.UpdatePayment:
+    properties:
+      amount:
+        type: integer
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - amount
+    - name
+    type: object
+  request.UpdatePrint:
+    properties:
+      description:
+        type: string
+      isDuplex:
+        type: boolean
+      name:
+        type: string
+      paperId:
+        type: string
+      price:
+        type: integer
+      qty:
+        type: integer
+      total:
+        type: integer
+    required:
+    - name
     type: object
   response.Response:
     properties:
@@ -111,6 +484,1523 @@ paths:
             $ref: '#/definitions/response.Response'
       tags:
       - Authentication
+  /customer:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: address
+        type: string
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: email
+        type: string
+      - in: query
+        name: endDt
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: phoneNumber
+        type: string
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      - in: query
+        name: startDt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Customer
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateCustomer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Customer
+  /customer/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Customer
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Customer
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateCustomer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Customer
+  /design:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: endDt
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: orderId
+        type: string
+      - in: query
+        name: orderName
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      - in: query
+        name: startDt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Design
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateDesign'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Design
+  /design/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Design
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Design
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateDesign'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Design
+  /finishing:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: endDt
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: orderId
+        type: string
+      - in: query
+        name: orderName
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      - in: query
+        name: startDt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Finishing
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateFinishing'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Finishing
+  /finishing/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Finishing
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Finishing
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateFinishing'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Finishing
+  /order:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: customerId
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: endDt
+        type: string
+      - in: query
+        name: isDone
+        type: boolean
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: phaseId
+        type: string
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      - in: query
+        name: startDt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+  /order/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+  /order/{id}/add-payment:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddPayment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+  /order/{id}/add-phase:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddPhase'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+  /order/{id}/invoice:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+  /order/{id}/spk:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
+  /other:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: endDt
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: orderId
+        type: string
+      - in: query
+        name: orderName
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      - in: query
+        name: startDt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Other
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateOther'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Other
+  /other/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Other
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Other
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateOther'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Other
+  /paper:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Paper
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreatePaper'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Paper
+  /paper/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Paper
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Paper
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePaper'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Paper
+  /payment:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: orderId
+        type: string
+      - in: query
+        name: orderName
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Payment
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreatePayment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Payment
+  /payment/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Payment
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Payment
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePayment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Payment
+  /phase:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Phase
+  /print:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        name: companyId
+        type: string
+      - in: query
+        name: companyName
+        type: string
+      - in: query
+        name: createName
+        type: string
+      - in: query
+        name: description
+        type: string
+      - in: query
+        name: endDt
+        type: string
+      - in: query
+        name: isDuplex
+        type: boolean
+      - example: 10
+        in: query
+        name: limit
+        type: integer
+      - in: query
+        name: name
+        type: string
+      - in: query
+        name: orderId
+        type: string
+      - in: query
+        name: orderName
+        type: string
+      - example: 1
+        in: query
+        name: page
+        type: integer
+      - in: query
+        name: paperId
+        type: string
+      - in: query
+        name: paperName
+        type: string
+      - in: query
+        name: preloads
+        type: string
+      - example: ""
+        in: query
+        name: sortField
+        type: string
+      - example: ""
+        in: query
+        name: sortOrder
+        type: string
+      - in: query
+        name: startDt
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Print
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreatePrint'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Print
+  /print/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Print
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Print
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: json req body
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdatePrint'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Print
 securityDefinitions:
   BearerAuth:
     in: header

@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+var PreloadOrderphase = []string{
+	"Company",
+	"Order",
+}
+
 func (m *Orderphase) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
@@ -13,8 +18,10 @@ func (m *Orderphase) BeforeCreate(tx *gorm.DB) (err error) {
 		m.ID = utils.GetUniqueID()
 	}
 
-	m.CreateDt = now
-	m.UpdateDt = now
+	if m.CreateDt.IsZero() {
+		m.CreateDt = now
+		m.UpdateDt = now
+	}
 	return
 }
 
@@ -24,6 +31,6 @@ func (m *Orderphase) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Orderphase) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Orderphase) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}

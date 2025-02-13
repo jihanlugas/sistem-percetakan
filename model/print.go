@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+var PreloadPrint = []string{
+	"Company",
+	"Order",
+	"Paper",
+}
+
 func (m *Print) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
@@ -24,6 +30,6 @@ func (m *Print) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Print) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Print) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}

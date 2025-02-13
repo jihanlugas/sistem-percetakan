@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+var PreloadFinishing = []string{
+	"Company",
+	"Order",
+}
+
 func (m *Finishing) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
@@ -24,6 +29,6 @@ func (m *Finishing) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Finishing) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Finishing) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}

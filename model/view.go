@@ -30,7 +30,8 @@ type UserView struct {
 	Role              string         `json:"role"`
 	Email             string         `json:"email"`
 	Username          string         `json:"username"`
-	NoHp              string         `json:"noHp"`
+	PhoneNumber       string         `json:"phoneNumber"`
+	Address           string         `json:"address"`
 	Fullname          string         `json:"fullname"`
 	Passwd            string         `json:"-"`
 	PassVersion       int            `json:"passVersion"`
@@ -58,6 +59,9 @@ type CompanyView struct {
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
+	Email       string         `json:"email"`
+	PhoneNumber string         `json:"phoneNumber"`
+	Address     string         `json:"address"`
 	PhotoID     string         `json:"photoId"`
 	PhotoUrl    string         `json:"photoUrl"`
 	CreateBy    string         `json:"createBy"`
@@ -98,8 +102,10 @@ type CustomerView struct {
 	ID          string         `json:"id"`
 	CompanyID   string         `json:"companyId"`
 	Name        string         `json:"name"`
-	Customer    string         `json:"customer"`
-	NoHp        string         `json:"noHp"`
+	Description string         `json:"description"`
+	Email       string         `json:"email"`
+	Address     string         `json:"address"`
+	PhoneNumber string         `json:"phoneNumber"`
 	CreateBy    string         `json:"createBy"`
 	CreateDt    time.Time      `json:"createDt"`
 	UpdateBy    string         `json:"updateBy"`
@@ -108,6 +114,8 @@ type CustomerView struct {
 	CompanyName string         `json:"companyName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
 }
 
 func (CustomerView) TableName() string {
@@ -115,24 +123,40 @@ func (CustomerView) TableName() string {
 }
 
 type OrderView struct {
-	ID           string         `json:"id"`
-	CompanyID    string         `json:"companyId"`
-	CustomerID   string         `json:"customerId"`
-	Name         string         `json:"name"`
-	Description  string         `json:"description"`
-	IsDone       bool           `json:"isDone"`
-	CreateBy     string         `json:"createBy"`
-	CreateDt     time.Time      `json:"createDt"`
-	UpdateBy     string         `json:"updateBy"`
-	UpdateDt     time.Time      `json:"updateDt"`
-	DeleteDt     gorm.DeletedAt `json:"deleteDt"`
-	CompanyName  string         `json:"companyName"`
-	CustomerName string         `json:"customerName"`
-	CreateName   string         `json:"createName"`
-	UpdateName   string         `json:"updateName"`
+	ID             string         `json:"id"`
+	CompanyID      string         `json:"companyId"`
+	CustomerID     string         `json:"customerId"`
+	Name           string         `json:"name"`
+	Description    string         `json:"description"`
+	IsDone         bool           `json:"isDone"`
+	CreateBy       string         `json:"createBy"`
+	CreateDt       time.Time      `json:"createDt"`
+	UpdateBy       string         `json:"updateBy"`
+	UpdateDt       time.Time      `json:"updateDt"`
+	DeleteDt       gorm.DeletedAt `json:"deleteDt"`
+	OrderphaseID   string         `json:"orderphaseId"`
+	PhaseID        string         `json:"phaseId"`
+	OrderphaseName string         `json:"orderphaseName"`
+	TotalDesign    int64          `json:"totalDesign"`
+	TotalPrint     int64          `json:"totalPrint"`
+	TotalFinishing int64          `json:"totalFinishing"`
+	TotalOther     int64          `json:"totalOther"`
+	TotalPayment   int64          `json:"totalPayment"`
+	TotalOrder     int64          `json:"totalOrder"`
+	Outstanding    int64          `json:"outstanding"`
+	CompanyName    string         `json:"companyName"`
+	CustomerName   string         `json:"customerName"`
+	CreateName     string         `json:"createName"`
+	UpdateName     string         `json:"updateName"`
 
-	Company  *CompanyView  `json:"company"`
-	Customer *CustomerView `json:"customer"`
+	Company     *CompanyView     `json:"company,omitempty"`
+	Customer    *CustomerView    `json:"customer,omitempty"`
+	Designs     []DesignView     `json:"designs,omitempty" gorm:"foreignKey:OrderID"`
+	Prints      []PrintView      `json:"prints,omitempty" gorm:"foreignKey:OrderID"`
+	Finishings  []FinishingView  `json:"finishings,omitempty" gorm:"foreignKey:OrderID"`
+	Others      []OtherView      `json:"others,omitempty" gorm:"foreignKey:OrderID"`
+	Orderphases []OrderphaseView `json:"orderphases,omitempty" gorm:"foreignKey:OrderID"`
+	Payments    []PaymentView    `json:"payments,omitempty" gorm:"foreignKey:OrderID"`
 }
 
 func (OrderView) TableName() string {
@@ -140,18 +164,22 @@ func (OrderView) TableName() string {
 }
 
 type PaperView struct {
-	ID          string         `json:"id"`
-	CompanyID   string         `json:"companyId"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	CreateBy    string         `json:"createBy"`
-	CreateDt    time.Time      `json:"createDt"`
-	UpdateBy    string         `json:"updateBy"`
-	UpdateDt    time.Time      `json:"updateDt"`
-	DeleteDt    gorm.DeletedAt `json:"deleteDt"`
-	CompanyName string         `json:"companyName"`
-	CreateName  string         `json:"createName"`
-	UpdateName  string         `json:"updateName"`
+	ID                 string         `json:"id"`
+	CompanyID          string         `json:"companyId"`
+	Name               string         `json:"name"`
+	Description        string         `json:"description"`
+	DefaultPrice       int            `json:"defaultPrice"`
+	DefaultPriceDuplex int            `json:"defaultPriceDuplex"`
+	CreateBy           string         `json:"createBy"`
+	CreateDt           time.Time      `json:"createDt"`
+	UpdateBy           string         `json:"updateBy"`
+	UpdateDt           time.Time      `json:"updateDt"`
+	DeleteDt           gorm.DeletedAt `json:"deleteDt"`
+	CompanyName        string         `json:"companyName"`
+	CreateName         string         `json:"createName"`
+	UpdateName         string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
 }
 
 func (PaperView) TableName() string {
@@ -176,6 +204,9 @@ type DesignView struct {
 	OrderName   string         `json:"orderName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
+	Order   *OrderView   `json:"order,omitempty"`
 }
 
 func (DesignView) TableName() string {
@@ -191,7 +222,7 @@ type PrintView struct {
 	Description string         `json:"description"`
 	IsDuplex    bool           `json:"isDuplex"`
 	PageCount   int64          `json:"pageCount"`
-	PrintCount  int64          `json:"printCount"`
+	Qty         int64          `json:"qty"`
 	Price       int64          `json:"price"`
 	Total       int64          `json:"total"`
 	CreateBy    string         `json:"createBy"`
@@ -201,8 +232,13 @@ type PrintView struct {
 	DeleteDt    gorm.DeletedAt `json:"deleteDt"`
 	CompanyName string         `json:"companyName"`
 	OrderName   string         `json:"orderName"`
+	PaperName   string         `json:"paperName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
+	Order   *OrderView   `json:"order,omitempty"`
+	Paper   *PaperView   `json:"paper,omitempty"`
 }
 
 func (PrintView) TableName() string {
@@ -227,6 +263,9 @@ type FinishingView struct {
 	OrderName   string         `json:"orderName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
+	Order   *OrderView   `json:"order,omitempty"`
 }
 
 func (FinishingView) TableName() string {
@@ -251,6 +290,9 @@ type OtherView struct {
 	OrderName   string         `json:"orderName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
+	Order   *OrderView   `json:"order,omitempty"`
 }
 
 func (OtherView) TableName() string {
@@ -271,6 +313,8 @@ type PhaseView struct {
 	CompanyName string         `json:"companyName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
 }
 
 func (PhaseView) TableName() string {
@@ -281,6 +325,7 @@ type OrderphaseView struct {
 	ID          string         `json:"id"`
 	CompanyID   string         `json:"companyId"`
 	OrderID     string         `json:"orderId"`
+	PhaseID     string         `json:"phaseId"`
 	Name        string         `json:"name"`
 	CreateBy    string         `json:"createBy"`
 	CreateDt    time.Time      `json:"createDt"`
@@ -291,6 +336,9 @@ type OrderphaseView struct {
 	OrderName   string         `json:"orderName"`
 	CreateName  string         `json:"createName"`
 	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
+	Order   *OrderView   `json:"order,omitempty"`
 }
 
 func (OrderphaseView) TableName() string {
@@ -298,22 +346,24 @@ func (OrderphaseView) TableName() string {
 }
 
 type PaymentView struct {
-	ID            string         `json:"id"`
-	CompanyID     string         `json:"companyId"`
-	OrderID       string         `json:"orderId"`
-	Name          string         `json:"name"`
-	Description   string         `json:"description"`
-	IsDonePayment bool           `json:"isDonePayment"`
-	Amount        int64          `json:"amount"`
-	CreateBy      string         `json:"createBy"`
-	CreateDt      time.Time      `json:"createDt"`
-	UpdateBy      string         `json:"updateBy"`
-	UpdateDt      time.Time      `json:"updateDt"`
-	DeleteDt      gorm.DeletedAt `json:"deleteDt"`
-	CompanyName   string         `json:"companyName"`
-	OrderName     string         `json:"orderName"`
-	CreateName    string         `json:"createName"`
-	UpdateName    string         `json:"updateName"`
+	ID          string         `json:"id"`
+	CompanyID   string         `json:"companyId"`
+	OrderID     string         `json:"orderId"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Amount      int64          `json:"amount"`
+	CreateBy    string         `json:"createBy"`
+	CreateDt    time.Time      `json:"createDt"`
+	UpdateBy    string         `json:"updateBy"`
+	UpdateDt    time.Time      `json:"updateDt"`
+	DeleteDt    gorm.DeletedAt `json:"deleteDt"`
+	CompanyName string         `json:"companyName"`
+	OrderName   string         `json:"orderName"`
+	CreateName  string         `json:"createName"`
+	UpdateName  string         `json:"updateName"`
+
+	Company *CompanyView `json:"company,omitempty"`
+	Order   *OrderView   `json:"order,omitempty"`
 }
 
 func (PaymentView) TableName() string {

@@ -7,5 +7,6 @@ type PagePhase struct {
 	Description string `json:"description" form:"description" query:"description"`
 	CompanyName string `json:"companyName" form:"companyName" query:"companyName"`
 	CreateName  string `json:"createName" form:"createName" query:"createName"`
-	Company     bool   `json:"company" form:"company" query:"company"`
+	Preloads    string `json:"preloads" form:"preloads" query:"preloads"`
+	//Company     bool   `json:"company" form:"company" query:"company"`
 }

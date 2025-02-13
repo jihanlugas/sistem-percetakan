@@ -33,7 +33,8 @@ type User struct {
 	Role              string         `gorm:"not null" json:"role"`
 	Email             string         `gorm:"not null" json:"email"`
 	Username          string         `gorm:"not null" json:"username"`
-	NoHp              string         `gorm:"not null" json:"noHp"`
+	PhoneNumber       string         `gorm:"not null" json:"phoneNumber"`
+	Address           string         `gorm:"not null" json:"address"`
 	Fullname          string         `gorm:"not null" json:"fullname"`
 	Passwd            string         `gorm:"not null" json:"-"`
 	PassVersion       int            `gorm:"not null" json:"passVersion"`
@@ -54,6 +55,9 @@ type Company struct {
 	ID          string         `gorm:"primaryKey" json:"id"`
 	Name        string         `gorm:"not null" json:"name"`
 	Description string         `gorm:"not null" json:"description"`
+	Email       string         `gorm:"not null" json:"email"`
+	PhoneNumber string         `gorm:"not null" json:"phoneNumber"`
+	Address     string         `gorm:"not null" json:"address"`
 	PhotoID     string         `gorm:"not null" json:"photoId"`
 	CreateBy    string         `gorm:"not null" json:"createBy"`
 	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
@@ -80,7 +84,9 @@ type Customer struct {
 	CompanyID   string         `gorm:"not null" json:"companyId"`
 	Name        string         `gorm:"not null" json:"name"`
 	Description string         `gorm:"not null" json:"description"`
-	NoHp        string         `gorm:"not null" json:"noHp"`
+	Email       string         `gorm:"not null" json:"email"`
+	PhoneNumber string         `gorm:"not null" json:"phoneNumber"`
+	Address     string         `gorm:"not null" json:"address"`
 	CreateBy    string         `gorm:"not null" json:"createBy"`
 	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
 	UpdateBy    string         `gorm:"not null" json:"updateBy"`
@@ -103,15 +109,17 @@ type Order struct {
 }
 
 type Paper struct {
-	ID          string         `gorm:"primaryKey" json:"id"`
-	CompanyID   string         `gorm:"not null" json:"companyId"`
-	Name        string         `gorm:"not null" json:"name"`
-	Description string         `gorm:"not null" json:"description"`
-	CreateBy    string         `gorm:"not null" json:"createBy"`
-	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
-	UpdateBy    string         `gorm:"not null" json:"updateBy"`
-	UpdateDt    time.Time      `gorm:"not null" json:"updateDt"`
-	DeleteDt    gorm.DeletedAt `gorm:"null" json:"deleteDt"`
+	ID                 string         `gorm:"primaryKey" json:"id"`
+	CompanyID          string         `gorm:"not null" json:"companyId"`
+	Name               string         `gorm:"not null" json:"name"`
+	Description        string         `gorm:"not null" json:"description"`
+	DefaultPrice       int            `gorm:"not null" json:"defaultPrice"`
+	DefaultPriceDuplex int            `gorm:"not null" json:"defaultPriceDuplex"`
+	CreateBy           string         `gorm:"not null" json:"createBy"`
+	CreateDt           time.Time      `gorm:"not null" json:"createDt"`
+	UpdateBy           string         `gorm:"not null" json:"updateBy"`
+	UpdateDt           time.Time      `gorm:"not null" json:"updateDt"`
+	DeleteDt           gorm.DeletedAt `gorm:"null" json:"deleteDt"`
 }
 
 type Design struct {
@@ -139,7 +147,7 @@ type Print struct {
 	Description string         `gorm:"not null" json:"description"`
 	IsDuplex    bool           `gorm:"not null" json:"isDuplex"`
 	PageCount   int64          `gorm:"not null" json:"pageCount"`
-	PrintCount  int64          `gorm:"not null" json:"printCount"`
+	Qty         int64          `gorm:"not null" json:"qty"`
 	Price       int64          `gorm:"not null" json:"price"`
 	Total       int64          `gorm:"not null" json:"total"`
 	CreateBy    string         `gorm:"not null" json:"createBy"`
@@ -198,6 +206,7 @@ type Orderphase struct {
 	ID        string         `gorm:"primaryKey" json:"id"`
 	CompanyID string         `gorm:"not null" json:"companyId"`
 	OrderID   string         `gorm:"not null" json:"orderId"`
+	PhaseID   string         `gorm:"not null" json:"phaseId"`
 	Name      string         `gorm:"not null" json:"name"`
 	CreateBy  string         `gorm:"not null" json:"createBy"`
 	CreateDt  time.Time      `gorm:"not null" json:"createDt"`
@@ -207,16 +216,15 @@ type Orderphase struct {
 }
 
 type Payment struct {
-	ID            string         `gorm:"primaryKey" json:"id"`
-	CompanyID     string         `gorm:"not null" json:"companyId"`
-	OrderID       string         `gorm:"not null" json:"orderId"`
-	Name          string         `gorm:"not null" json:"name"`
-	Description   string         `gorm:"not null" json:"description"`
-	IsDonePayment bool           `gorm:"not null" json:"isDonePayment"`
-	Amount        int64          `gorm:"not null" json:"amount"`
-	CreateBy      string         `gorm:"not null" json:"createBy"`
-	CreateDt      time.Time      `gorm:"not null" json:"createDt"`
-	UpdateBy      string         `gorm:"not null" json:"updateBy"`
-	UpdateDt      time.Time      `gorm:"not null" json:"updateDt"`
-	DeleteDt      gorm.DeletedAt `gorm:"null" json:"deleteDt"`
+	ID          string         `gorm:"primaryKey" json:"id"`
+	CompanyID   string         `gorm:"not null" json:"companyId"`
+	OrderID     string         `gorm:"not null" json:"orderId"`
+	Name        string         `gorm:"not null" json:"name"`
+	Description string         `gorm:"not null" json:"description"`
+	Amount      int64          `gorm:"not null" json:"amount"`
+	CreateBy    string         `gorm:"not null" json:"createBy"`
+	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
+	UpdateBy    string         `gorm:"not null" json:"updateBy"`
+	UpdateDt    time.Time      `gorm:"not null" json:"updateDt"`
+	DeleteDt    gorm.DeletedAt `gorm:"null" json:"deleteDt"`
 }

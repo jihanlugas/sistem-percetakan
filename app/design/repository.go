@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -15,6 +17,7 @@ type Repository interface {
 	Update(conn *gorm.DB, tDesign model.Design) error
 	Save(conn *gorm.DB, tDesign model.Design) error
 	Delete(conn *gorm.DB, tDesign model.Design) error
+	DeleteByOrderId(conn *gorm.DB, id string) error
 	Page(conn *gorm.DB, req request.PageDesign) (vDesigns []model.DesignView, count int64, err error)
 }
 
@@ -57,15 +60,19 @@ func (r repository) Delete(conn *gorm.DB, tDesign model.Design) error {
 	return conn.Delete(&tDesign).Error
 }
 
+func (r repository) DeleteByOrderId(conn *gorm.DB, id string) error {
+	return conn.Where("order_id = ? ", id).Delete(&model.Design{}).Error
+}
+
 func (r repository) Page(conn *gorm.DB, req request.PageDesign) (vDesigns []model.DesignView, count int64, err error) {
 	query := conn.Model(&vDesigns)
 
 	// preloads
-	if req.Company {
-		query = query.Preload("Company")
-	}
-	if req.Order {
-		query = query.Preload("Order")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadDesign) {
+			query = query.Preload(preload)
+		}
 	}
 
 	// query
@@ -90,6 +97,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageDesign) (vDesigns []mode
 	if req.CreateName != "" {
 		query = query.Where("create_name ILIKE ?", "%"+req.CreateName+"%")
 	}
+	if req.StartDt != nil {
+		query = query.Where("create_dt >= ?", req.StartDt)
+	}
+	if req.EndDt != nil {
+		query = query.Where("create_dt <= ?", req.EndDt)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {
@@ -101,9 +114,11 @@ func (r repository) Page(conn *gorm.DB, req request.PageDesign) (vDesigns []mode
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vDesigns).Error
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vDesigns).Error
 	if err != nil {
 		return vDesigns, count, err
 	}

@@ -34,6 +34,26 @@ var upCmd = &cobra.Command{
 	},
 }
 
+// upTableCmd - db up view
+var upTableCmd = &cobra.Command{
+	Use:   "table",
+	Short: "Migrate the database up table",
+	Long:  "Run database migrations to upgrade to the latest version.",
+	Run: func(cmd *cobra.Command, args []string) {
+		dbUpTable()
+	},
+}
+
+// upViewCmd - db up view
+var upViewCmd = &cobra.Command{
+	Use:   "view",
+	Short: "Migrate the database up view",
+	Long:  "Run database migrations to upgrade to the latest version.",
+	Run: func(cmd *cobra.Command, args []string) {
+		dbUpView()
+	},
+}
+
 // downCmd - db down
 var downCmd = &cobra.Command{
 	Use:   "down",
@@ -54,7 +74,7 @@ var seedCmd = &cobra.Command{
 	},
 }
 
-// seedCmd - db seed
+// seedCmd - db reset
 var resetCmd = &cobra.Command{
 	Use:   "reset",
 	Short: "Reset the database",
@@ -66,10 +86,14 @@ var resetCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(dbCmd)
+
 	dbCmd.AddCommand(upCmd)
 	dbCmd.AddCommand(downCmd)
 	dbCmd.AddCommand(seedCmd)
 	dbCmd.AddCommand(resetCmd)
+
+	upCmd.AddCommand(upViewCmd)
+	upCmd.AddCommand(upTableCmd)
 }
 
 func Execute() {

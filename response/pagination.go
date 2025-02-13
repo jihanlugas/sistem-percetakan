@@ -14,11 +14,17 @@ type Pagination struct {
 }
 
 func PayloadPagination(req request.IPaging, list interface{}, totalData int64) *Pagination {
+	dataPerPage := int(totalData)
+	totalPage := 1
+	if req.GetLimit() > 0 {
+		dataPerPage = req.GetLimit()
+		totalPage = int(math.Ceil(float64(totalData) / float64(req.GetLimit())))
+	}
 	pgn := Pagination{
 		Page:        req.GetPage(),
-		DataPerPage: req.GetLimit(),
+		DataPerPage: dataPerPage,
 		TotalData:   totalData,
-		TotalPage:   int(math.Ceil(float64(totalData) / float64(req.GetLimit()))),
+		TotalPage:   totalPage,
 		List:        list,
 	}
 

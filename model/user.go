@@ -26,9 +26,9 @@ func (m *User) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *User) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *User) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}
 
 func (m *UserView) AfterFind(tx *gorm.DB) (err error) {
 	if m.PhotoUrl != "" {

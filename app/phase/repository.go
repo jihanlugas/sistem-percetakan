@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -61,8 +63,11 @@ func (r repository) Page(conn *gorm.DB, req request.PagePhase) (vPhases []model.
 	query := conn.Model(&vPhases)
 
 	// preloads
-	if req.Company {
-		query = query.Preload("Company")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadPhase) {
+			query = query.Preload(preload)
+		}
 	}
 
 	// query
@@ -90,11 +95,14 @@ func (r repository) Page(conn *gorm.DB, req request.PagePhase) (vPhases []model.
 	if req.SortField != "" {
 		query = query.Order(fmt.Sprintf("%s %s", req.SortField, req.SortOrder))
 	} else {
-		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
+		query = query.Order(fmt.Sprintf("%s %s", "\"order\"", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vPhases).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vPhases).Error
 	if err != nil {
 		return vPhases, count, err
 	}

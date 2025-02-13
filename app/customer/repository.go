@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -60,9 +62,11 @@ func (r repository) Delete(conn *gorm.DB, tCustomer model.Customer) error {
 func (r repository) Page(conn *gorm.DB, req request.PageCustomer) (vCustomers []model.CustomerView, count int64, err error) {
 	query := conn.Model(&vCustomers)
 
-	// preloads
-	if req.Company {
-		query = query.Preload("Company")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadCustomer) {
+			query = query.Preload(preload)
+		}
 	}
 
 	// query
@@ -81,6 +85,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageCustomer) (vCustomers []
 	if req.CreateName != "" {
 		query = query.Where("create_name ILIKE ?", "%"+req.CreateName+"%")
 	}
+	if req.StartDt != nil {
+		query = query.Where("create_dt >= ?", req.StartDt)
+	}
+	if req.EndDt != nil {
+		query = query.Where("create_dt <= ?", req.EndDt)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {
@@ -92,9 +102,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageCustomer) (vCustomers []
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vCustomers).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vCustomers).Error
 	if err != nil {
 		return vCustomers, count, err
 	}

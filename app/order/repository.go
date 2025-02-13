@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -23,7 +25,9 @@ type repository struct {
 
 func (r repository) GetTableById(conn *gorm.DB, id string, preloads ...string) (tOrder model.Order, err error) {
 	for _, preload := range preloads {
-		conn = conn.Preload(preload)
+		if utils.IsAvailablePreload(preload, model.PreloadOrder) {
+			conn = conn.Preload(preload)
+		}
 	}
 	err = conn.Where("id = ? ", id).First(&tOrder).Error
 	return tOrder, err
@@ -31,7 +35,9 @@ func (r repository) GetTableById(conn *gorm.DB, id string, preloads ...string) (
 
 func (r repository) GetViewById(conn *gorm.DB, id string, preloads ...string) (vOrder model.OrderView, err error) {
 	for _, preload := range preloads {
-		conn = conn.Preload(preload)
+		if utils.IsAvailablePreload(preload, model.PreloadOrder) {
+			conn = conn.Preload(preload)
+		}
 	}
 	err = conn.Where("id = ? ", id).First(&vOrder).Error
 	return vOrder, err
@@ -60,11 +66,11 @@ func (r repository) Delete(conn *gorm.DB, tOrder model.Order) error {
 func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.OrderView, count int64, err error) {
 	query := conn.Model(&vOrders)
 
-	if req.Company {
-		query = query.Preload("Company")
-	}
-	if req.Customer {
-		query = query.Preload("Customer")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadOrder) {
+			query = query.Preload(preload)
+		}
 	}
 
 	if req.CompanyID != "" {
@@ -73,20 +79,23 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 	if req.CustomerID != "" {
 		query = query.Where("customer_id = ?", req.CustomerID)
 	}
+	if req.PhaseID != "" {
+		query = query.Where("phase_id = ?", req.PhaseID)
+	}
 	if req.Name != "" {
 		query = query.Where("name ILIKE ?", "%"+req.Name+"%")
 	}
 	if req.Description != "" {
 		query = query.Where("description ILIKE ?", "%"+req.Description+"%")
 	}
-	if req.CompanyName != "" {
-		query = query.Where("company_name ILIKE ?", "%"+req.CompanyName+"%")
+	if req.IsDone != nil {
+		query = query.Where("is_done = ?", req.IsDone)
 	}
-	if req.CustomerName != "" {
-		query = query.Where("customer_name ILIKE ?", "%"+req.CustomerName+"%")
+	if req.StartDt != nil {
+		query = query.Where("create_dt >= ?", req.StartDt)
 	}
-	if req.CreateName != "" {
-		query = query.Where("create_name ILIKE ?", "%"+req.CreateName+"%")
+	if req.EndDt != nil {
+		query = query.Where("create_dt <= ?", req.EndDt)
 	}
 
 	err = query.Count(&count).Error
@@ -97,11 +106,14 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 	if req.SortField != "" {
 		query = query.Order(fmt.Sprintf("%s %s", req.SortField, req.SortOrder))
 	} else {
-		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
+		query = query.Order(fmt.Sprintf("%s %s", "create_dt", "desc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vOrders).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vOrders).Error
 	if err != nil {
 		return vOrders, count, err
 	}

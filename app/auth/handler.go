@@ -9,12 +9,12 @@ import (
 	"net/http"
 )
 
-type handler struct {
+type Handler struct {
 	usecase Usecase
 }
 
-func NewHandler(usecase Usecase) handler {
-	return handler{
+func NewHandler(usecase Usecase) Handler {
+	return Handler{
 		usecase: usecase,
 	}
 }
@@ -27,7 +27,7 @@ func NewHandler(usecase Usecase) handler {
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
 // @Router /auth/sign-in [post]
-func (h handler) SignIn(c echo.Context) error {
+func (h Handler) SignIn(c echo.Context) error {
 	var err error
 
 	req := new(request.Signin)
@@ -61,7 +61,7 @@ func (h handler) SignIn(c echo.Context) error {
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
 // @Router /auth/sign-out [get]
-func (h handler) SignOut(c echo.Context) error {
+func (h Handler) SignOut(c echo.Context) error {
 	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
 }
 
@@ -73,7 +73,7 @@ func (h handler) SignOut(c echo.Context) error {
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
 // @Router /auth/refresh-token [get]
-func (h handler) RefreshToken(c echo.Context) error {
+func (h Handler) RefreshToken(c echo.Context) error {
 	var err error
 
 	loginUser, err := jwt.GetUserLoginInfo(c)
@@ -99,7 +99,7 @@ func (h handler) RefreshToken(c echo.Context) error {
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
 // @Router /auth/init [get]
-func (h handler) Init(c echo.Context) error {
+func (h Handler) Init(c echo.Context) error {
 	var err error
 
 	loginUser, err := jwt.GetUserLoginInfo(c)

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -15,13 +17,14 @@ type Repository interface {
 	Update(conn *gorm.DB, tPrint model.Print) error
 	Save(conn *gorm.DB, tPrint model.Print) error
 	Delete(conn *gorm.DB, tPrint model.Print) error
+	DeleteByOrderId(conn *gorm.DB, id string) error
 	Page(conn *gorm.DB, req request.PagePrint) (vPrints []model.PrintView, count int64, err error)
 }
 
-type repository struct {
+type repositoryy struct {
 }
 
-func (r repository) GetTableById(conn *gorm.DB, id string, preloads ...string) (tPrint model.Print, err error) {
+func (r repositoryy) GetTableById(conn *gorm.DB, id string, preloads ...string) (tPrint model.Print, err error) {
 	for _, preload := range preloads {
 		conn = conn.Preload(preload)
 	}
@@ -29,7 +32,7 @@ func (r repository) GetTableById(conn *gorm.DB, id string, preloads ...string) (
 	return tPrint, err
 }
 
-func (r repository) GetViewById(conn *gorm.DB, id string, preloads ...string) (vPrint model.PrintView, err error) {
+func (r repositoryy) GetViewById(conn *gorm.DB, id string, preloads ...string) (vPrint model.PrintView, err error) {
 	for _, preload := range preloads {
 		conn = conn.Preload(preload)
 	}
@@ -37,38 +40,39 @@ func (r repository) GetViewById(conn *gorm.DB, id string, preloads ...string) (v
 	return vPrint, err
 }
 
-func (r repository) Create(conn *gorm.DB, tPrint model.Print) error {
+func (r repositoryy) Create(conn *gorm.DB, tPrint model.Print) error {
 	return conn.Create(&tPrint).Error
 }
 
-func (r repository) Creates(conn *gorm.DB, tPrints []model.Print) error {
+func (r repositoryy) Creates(conn *gorm.DB, tPrints []model.Print) error {
 	return conn.Create(&tPrints).Error
 }
 
-func (r repository) Update(conn *gorm.DB, tPrint model.Print) error {
+func (r repositoryy) Update(conn *gorm.DB, tPrint model.Print) error {
 	return conn.Model(&tPrint).Updates(&tPrint).Error
 }
 
-func (r repository) Save(conn *gorm.DB, tPrint model.Print) error {
+func (r repositoryy) Save(conn *gorm.DB, tPrint model.Print) error {
 	return conn.Save(&tPrint).Error
 }
 
-func (r repository) Delete(conn *gorm.DB, tPrint model.Print) error {
+func (r repositoryy) Delete(conn *gorm.DB, tPrint model.Print) error {
 	return conn.Delete(&tPrint).Error
 }
 
-func (r repository) Page(conn *gorm.DB, req request.PagePrint) (vPrints []model.PrintView, count int64, err error) {
+func (r repositoryy) DeleteByOrderId(conn *gorm.DB, id string) error {
+	return conn.Where("order_id = ? ", id).Delete(&model.Print{}).Error
+}
+
+func (r repositoryy) Page(conn *gorm.DB, req request.PagePrint) (vPrints []model.PrintView, count int64, err error) {
 	query := conn.Model(&vPrints)
 
 	// preloads
-	if req.Company {
-		query = query.Preload("Company")
-	}
-	if req.Order {
-		query = query.Preload("Order")
-	}
-	if req.Paper {
-		query = query.Preload("Paper")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadPrint) {
+			query = query.Preload(preload)
+		}
 	}
 
 	// query
@@ -102,6 +106,12 @@ func (r repository) Page(conn *gorm.DB, req request.PagePrint) (vPrints []model.
 	if req.CreateName != "" {
 		query = query.Where("create_name ILIKE ?", "%"+req.CreateName+"%")
 	}
+	if req.StartDt != nil {
+		query = query.Where("create_dt >= ?", req.StartDt)
+	}
+	if req.EndDt != nil {
+		query = query.Where("create_dt <= ?", req.EndDt)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {
@@ -113,9 +123,12 @@ func (r repository) Page(conn *gorm.DB, req request.PagePrint) (vPrints []model.
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vPrints).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vPrints).Error
 	if err != nil {
 		return vPrints, count, err
 	}
@@ -124,5 +137,5 @@ func (r repository) Page(conn *gorm.DB, req request.PagePrint) (vPrints []model.
 }
 
 func NewRepository() Repository {
-	return &repository{}
+	return &repositoryy{}
 }

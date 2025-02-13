@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
@@ -61,11 +63,11 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrderphase) (vOrderphase
 	query := conn.Model(&vOrderphases)
 
 	// preloads
-	if req.Company {
-		query = query.Preload("Company")
-	}
-	if req.Order {
-		query = query.Preload("Order")
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadOrderphase) {
+			query = query.Preload(preload)
+		}
 	}
 
 	// query
@@ -98,9 +100,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrderphase) (vOrderphase
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vOrderphases).Error
+
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vOrderphases).Error
 	if err != nil {
 		return vOrderphases, count, err
 	}

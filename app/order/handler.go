@@ -1,0 +1,378 @@
+package order
+
+import (
+	"bytes"
+	"fmt"
+	"github.com/jihanlugas/sistem-percetakan/app/auth"
+	"github.com/jihanlugas/sistem-percetakan/jwt"
+	"github.com/jihanlugas/sistem-percetakan/request"
+	"github.com/jihanlugas/sistem-percetakan/response"
+	"github.com/jihanlugas/sistem-percetakan/utils"
+	"github.com/labstack/echo/v4"
+	"net/http"
+	"strings"
+	"time"
+)
+
+type Handler struct {
+	usecase Usecase
+}
+
+func NewHandler(usecase Usecase) Handler {
+	return Handler{
+		usecase: usecase,
+	}
+}
+
+// Page
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param req query request.PageOrder false "url query string"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order [get]
+func (h Handler) Page(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	req := new(request.PageOrder)
+	if err = c.Bind(req); err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
+	}
+
+	utils.TrimWhitespace(req)
+
+	err = c.Validate(req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
+	}
+
+	if req.CompanyID == "" {
+		req.CompanyID = loginUser.CompanyID
+	} else {
+		if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+			return response.Error(http.StatusBadRequest, response.ErrorHandlerIDOR, err, nil).SendJSON(c)
+		}
+	}
+
+	data, count, err := h.usecase.Page(loginUser, *req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, response.PayloadPagination(req, data, count)).SendJSON(c)
+}
+
+// GetById
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Query preloads query string false "preloads"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id} [get]
+func (h Handler) GetById(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	preloads := c.QueryParam("preloads")
+	preloadSlice := strings.Split(preloads, ",")
+
+	vOrder, err := h.usecase.GetById(loginUser, id, preloadSlice...)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, vOrder).SendJSON(c)
+}
+
+// GenerateSpk
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Query preloads query string false "preloads"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id}/spk [get]
+func (h Handler) GenerateSpk(c echo.Context) error {
+	var err error
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	pdf, vOrder, err := h.usecase.GenerateSpk(id)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	// Menyimpan PDF ke buffer
+	var buf bytes.Buffer
+	err = pdf.Output(&buf)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to generate PDF")
+	}
+
+	//Set the Content-Disposition header to suggest a filename
+	filename := fmt.Sprintf("%s SPK %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
+
+	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(buf.Bytes()))
+}
+
+// GenerateInvoice
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Query preloads query string false "preloads"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id}/invoice [get]
+func (h Handler) GenerateInvoice(c echo.Context) error {
+	var err error
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	pdf, _, err := h.usecase.GenerateInvoice(id)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	// Menyimpan PDF ke buffer
+	var buf bytes.Buffer
+	err = pdf.Output(&buf)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, fmt.Sprintf("Failed to generate PDF: %v", err))
+	}
+
+	//Set the Content-Disposition header to suggest a filename
+	//filename := fmt.Sprintf("%s Invoice %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
+	//c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
+
+	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(buf.Bytes()))
+}
+
+// Create
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param req body request.CreateOrder true "json req body"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order [post]
+func (h Handler) Create(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	req := new(request.CreateOrder)
+	if err = c.Bind(req); err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
+	}
+
+	utils.TrimWhitespace(req)
+
+	err = c.Validate(req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
+	}
+
+	if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerIDOR, err, nil).SendJSON(c)
+	}
+
+	err = h.usecase.Create(loginUser, *req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
+}
+
+// Update
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Param req body request.UpdateOrder true "json req body"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id} [put]
+func (h Handler) Update(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	req := new(request.UpdateOrder)
+	if err = c.Bind(req); err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
+	}
+
+	utils.TrimWhitespace(req)
+
+	err = c.Validate(req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
+	}
+
+	err = h.usecase.Update(loginUser, id, *req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
+}
+
+// AddPhase
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Param req body request.AddPhase true "json req body"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id}/add-phase [post]
+func (h Handler) AddPhase(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	req := new(request.AddPhase)
+	if err = c.Bind(req); err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
+	}
+
+	utils.TrimWhitespace(req)
+
+	err = c.Validate(req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
+	}
+
+	err = h.usecase.AddPhase(loginUser, id, *req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
+}
+
+// AddPayment
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Param req body request.AddPayment true "json req body"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id}/add-payment [post]
+func (h Handler) AddPayment(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	req := new(request.AddPayment)
+	if err = c.Bind(req); err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
+	}
+
+	utils.TrimWhitespace(req)
+
+	err = c.Validate(req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
+	}
+
+	err = h.usecase.AddPayment(loginUser, id, *req)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
+}
+
+// Delete
+// @Tags Order
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /order/{id} [delete]
+func (h Handler) Delete(c echo.Context) error {
+	var err error
+
+	loginUser, err := jwt.GetUserLoginInfo(c)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	err = h.usecase.Delete(loginUser, id)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
+}

@@ -20,7 +20,7 @@ func websiteRouter() *echo.Echo {
 		AllowCredentials: true,
 		AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
 		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderCookie, echo.HeaderXRequestedWith, echo.HeaderXRealIP, echo.HeaderAuthorization},
-		ExposeHeaders:    []string{echo.HeaderSetCookie},
+		ExposeHeaders:    []string{echo.HeaderSetCookie, echo.HeaderContentDisposition},
 		Skipper: func(c echo.Context) bool {
 			return false
 		},

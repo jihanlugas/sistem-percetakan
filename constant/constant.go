@@ -5,12 +5,13 @@ package constant
 // 8 int8 migration
 // 24 string
 const (
-	TokenUserContext = "usr"
-	TokenContentLen  = 6
-	FormatDateLayout = "2006-01-02"
-	BearerSchema     = "Bearer"
-	RoleAdmin        = "ADMIN"
-	RoleUseradmin    = "USERADMIN"
-	RoleUser         = "USER"
-	AuthHeaderKey    = "Authorization"
+	TokenUserContext     = "usr"
+	TokenContentLen      = 6
+	FormatDateLayout     = "02-01-2006"
+	FormatDatetimeLayout = "02-01-2006 15:04"
+	BearerSchema         = "Bearer"
+	RoleAdmin            = "ADMIN"
+	RoleUseradmin        = "USERADMIN"
+	RoleUser             = "USER"
+	AuthHeaderKey        = "Authorization"
 )

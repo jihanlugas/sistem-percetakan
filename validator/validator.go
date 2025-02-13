@@ -18,8 +18,8 @@ import (
 )
 
 var (
-	Validate *CustomValidator
-	regxNoHp *regexp.Regexp
+	Validate        *CustomValidator
+	regxPhoneNumber *regexp.Regexp
 )
 
 type CustomValidator struct {
@@ -28,7 +28,7 @@ type CustomValidator struct {
 
 func init() {
 	Validate = NewValidator()
-	regxNoHp = regexp.MustCompile(`((^\+?628\d{8,14}$)|(^0?8\d{8,14}$)){1}`)
+	regxPhoneNumber = regexp.MustCompile(`((^\+?628\d{8,14}$)|(^0?8\d{8,14}$)){1}`)
 }
 
 func (v *CustomValidator) Validate(i interface{}) error {
@@ -53,7 +53,7 @@ func NewValidator() *CustomValidator {
 
 	_ = validate.RegisterValidation("notexists", notExistsOnDbTable)
 	_ = validate.RegisterValidation("existsdata", existsDataOnDbTable)
-	_ = validate.RegisterValidation("no_hp", validNoHp)
+	_ = validate.RegisterValidation("no_hp", validPhoneNumber)
 	_ = validate.RegisterValidation("passwdComplex", checkPasswordComplexity)
 	_ = validate.RegisterValidation("base64PhotoCheck", base64PhotoCheck, true)
 	//_ = validate.RegisterValidation("hiragana", hiragana)
@@ -99,7 +99,7 @@ func notExistsOnDbTable(fl validator.FieldLevel) bool {
 		return false
 
 	case "no_hp":
-		_, err = userRepo.GetByNoHp(conn, utils.FormatPhoneTo62(val))
+		_, err = userRepo.GetByPhoneNumber(conn, utils.FormatPhoneTo62(val))
 		if err != nil && err == gorm.ErrRecordNotFound {
 			return true
 		}
@@ -168,8 +168,8 @@ func checkPasswordComplexity(fl validator.FieldLevel) bool {
 	return false
 }
 
-func validNoHp(fl validator.FieldLevel) bool {
-	return regxNoHp.MatchString(fl.Field().String())
+func validPhoneNumber(fl validator.FieldLevel) bool {
+	return regxPhoneNumber.MatchString(fl.Field().String())
 }
 
 func base64PhotoCheck(fl validator.FieldLevel) bool {

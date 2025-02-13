@@ -80,9 +80,11 @@ func (r repository) Page(conn *gorm.DB, req request.PageCompany) (vCompanies []m
 	} else {
 		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
 	}
-	err = query.Offset((req.GetPage() - 1) * req.GetLimit()).
-		Limit(req.GetLimit()).
-		Find(&vCompanies).Error
+	if req.Limit >= 0 {
+		query = query.Offset((req.GetPage() - 1) * req.GetLimit()).Limit(req.GetLimit())
+	}
+
+	err = query.Find(&vCompanies).Error
 	if err != nil {
 		return vCompanies, count, err
 	}

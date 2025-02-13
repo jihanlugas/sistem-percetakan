@@ -5,6 +5,16 @@ import (
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/app/company"
+	"github.com/jihanlugas/sistem-percetakan/app/customer"
+	"github.com/jihanlugas/sistem-percetakan/app/design"
+	"github.com/jihanlugas/sistem-percetakan/app/finishing"
+	"github.com/jihanlugas/sistem-percetakan/app/order"
+	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
+	"github.com/jihanlugas/sistem-percetakan/app/other"
+	"github.com/jihanlugas/sistem-percetakan/app/paper"
+	"github.com/jihanlugas/sistem-percetakan/app/payment"
+	"github.com/jihanlugas/sistem-percetakan/app/phase"
+	"github.com/jihanlugas/sistem-percetakan/app/print"
 	"github.com/jihanlugas/sistem-percetakan/app/user"
 	"github.com/jihanlugas/sistem-percetakan/app/usercompany"
 	"github.com/jihanlugas/sistem-percetakan/config"
@@ -25,10 +35,38 @@ func Init() *echo.Echo {
 	userRepository := user.NewRepository()
 	companyRepository := company.NewRepository()
 	usercompanyRepository := usercompany.NewRepository()
+	orderRepository := order.NewRepository()
+	designRepository := design.NewRepository()
+	printRepository := print.NewRepository()
+	finishingRepository := finishing.NewRepository()
+	otherRepository := other.NewRepository()
+	orderphaseRepository := orderphase.NewRepository()
+	customerRepository := customer.NewRepository()
+	paperRepository := paper.NewRepository()
+	phaseRepository := phase.NewRepository()
+	paymentRepository := payment.NewRepository()
 
 	authUsecase := auth.NewUsecase(userRepository, companyRepository, usercompanyRepository)
+	orderUsecase := order.NewUsecase(orderRepository, designRepository, printRepository, finishingRepository, otherRepository, orderphaseRepository, customerRepository, phaseRepository, paymentRepository)
+	customerUsecase := customer.NewUsecase(customerRepository)
+	paperUsecase := paper.NewUsecase(paperRepository)
+	phaseUsecase := phase.NewUsecase(phaseRepository)
+	designUsecase := design.NewUsecase(designRepository)
+	printUsecase := print.NewUsecase(printRepository)
+	finishingUsecase := finishing.NewUsecase(finishingRepository)
+	otherUsecase := other.NewUsecase(otherRepository)
+	paymentUsecase := payment.NewUsecase(paymentRepository)
 
 	authHandler := auth.NewHandler(authUsecase)
+	orderHandler := order.NewHandler(orderUsecase)
+	customerHandler := customer.NewHandler(customerUsecase)
+	paperHandler := paper.NewHandler(paperUsecase)
+	phaseHandler := phase.NewHandler(phaseUsecase)
+	designHandler := design.NewHandler(designUsecase)
+	printHandler := print.NewHandler(printUsecase)
+	finishingHandler := finishing.NewHandler(finishingUsecase)
+	otherHandler := other.NewHandler(otherUsecase)
+	paymentHandler := payment.NewHandler(paymentUsecase)
 
 	if config.Debug {
 		router.GET("/", func(c echo.Context) error {
@@ -44,6 +82,72 @@ func Init() *echo.Echo {
 	routerAuth.POST("/sign-out", authHandler.SignOut)
 	routerAuth.GET("/init", authHandler.Init, checkTokenMiddleware)
 	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
+
+	routerOrder := router.Group("/order", checkTokenMiddleware)
+	routerOrder.GET("", orderHandler.Page)
+	routerOrder.POST("", orderHandler.Create)
+	routerOrder.GET("/:id", orderHandler.GetById)
+	routerOrder.GET("/:id/spk", orderHandler.GenerateSpk)
+	//routerOrder.GET("/:id/invoice", orderHandler.GenerateInvoice)
+	routerOrder.PUT("/:id", orderHandler.Update)
+	routerOrder.POST("/:id/add-phase", orderHandler.AddPhase)
+	routerOrder.POST("/:id/add-payment", orderHandler.AddPayment)
+	routerOrder.DELETE("/:id", orderHandler.Delete)
+
+	//router.GET("/order/:id/spk", orderHandler.GenerateSPK)
+	router.GET("/order/:id/invoice", orderHandler.GenerateInvoice)
+
+	routerCustomer := router.Group("/customer", checkTokenMiddleware)
+	routerCustomer.GET("", customerHandler.Page)
+	routerCustomer.POST("", customerHandler.Create)
+	routerCustomer.PUT("/:id", customerHandler.Update)
+	routerCustomer.GET("/:id", customerHandler.GetById)
+	routerCustomer.DELETE("/:id", customerHandler.Delete)
+
+	routerPaper := router.Group("/paper", checkTokenMiddleware)
+	routerPaper.GET("", paperHandler.Page)
+	routerPaper.POST("", paperHandler.Create)
+	routerPaper.PUT("/:id", paperHandler.Update)
+	routerPaper.GET("/:id", paperHandler.GetById)
+	routerPaper.DELETE("/:id", paperHandler.Delete)
+
+	routerPhase := router.Group("/phase", checkTokenMiddleware)
+	routerPhase.GET("", phaseHandler.Page)
+
+	routerDesign := router.Group("/design", checkTokenMiddleware)
+	routerDesign.GET("", designHandler.Page)
+	routerDesign.POST("", designHandler.Create)
+	routerDesign.PUT("/:id", designHandler.Update)
+	routerDesign.GET("/:id", designHandler.GetById)
+	routerDesign.DELETE("/:id", designHandler.Delete)
+
+	routerPrint := router.Group("/print", checkTokenMiddleware)
+	routerPrint.GET("", printHandler.Page)
+	routerPrint.POST("", printHandler.Create)
+	routerPrint.PUT("/:id", printHandler.Update)
+	routerPrint.GET("/:id", printHandler.GetById)
+	routerPrint.DELETE("/:id", printHandler.Delete)
+
+	routerFinishing := router.Group("/finishing", checkTokenMiddleware)
+	routerFinishing.GET("", finishingHandler.Page)
+	routerFinishing.POST("", finishingHandler.Create)
+	routerFinishing.PUT("/:id", finishingHandler.Update)
+	routerFinishing.GET("/:id", finishingHandler.GetById)
+	routerFinishing.DELETE("/:id", finishingHandler.Delete)
+
+	routerOther := router.Group("/other", checkTokenMiddleware)
+	routerOther.GET("", otherHandler.Page)
+	routerOther.POST("", otherHandler.Create)
+	routerOther.PUT("/:id", otherHandler.Update)
+	routerOther.GET("/:id", otherHandler.GetById)
+	routerOther.DELETE("/:id", otherHandler.Delete)
+
+	routerPayment := router.Group("/payment", checkTokenMiddleware)
+	routerPayment.GET("", paymentHandler.Page)
+	routerPayment.POST("", paymentHandler.Create)
+	routerPayment.PUT("/:id", paymentHandler.Update)
+	routerPayment.GET("/:id", paymentHandler.GetById)
+	routerPayment.DELETE("/:id", paymentHandler.Delete)
 
 	return router
 }
@@ -115,3 +219,13 @@ func checkTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+//func checkAdminMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+//	return func(c echo.Context) error {
+//		userLogin := c.Get(constant.TokenUserContext).(*jwt.UserLogin)
+//		if !userLogin.IsAdmin {
+//			return response.ErrorForce(http.StatusForbidden, response.ErrorMiddlewareNotAdmin).SendJSON(c)
+//		}
+//		return next(c)
+//	}
+//}

@@ -8,6 +8,7 @@ type PageOrderphase struct {
 	CompanyName string `json:"companyName" form:"companyName" query:"companyName"`
 	OrderName   string `json:"orderName" form:"orderName" query:"orderName"`
 	CreateName  string `json:"createName" form:"createName" query:"createName"`
-	Company     bool   `json:"company" form:"company" query:"company"`
-	Order       bool   `json:"order" form:"order" query:"order"`
+	Preloads    string `json:"preloads" form:"preloads" query:"preloads"`
+	//Company     bool   `json:"company" form:"company" query:"company"`
+	//Order       bool   `json:"order" form:"order" query:"order"`
 }

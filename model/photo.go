@@ -17,6 +17,6 @@ func (m *Photo) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Photo) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Photo) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}

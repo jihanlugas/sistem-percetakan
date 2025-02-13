@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"github.com/jihanlugas/sistem-percetakan/constant"
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 )
 
 var regFormatHp *regexp.Regexp
@@ -13,7 +15,7 @@ func init() {
 }
 
 func FormatPhoneTo62(phone string) string {
-	formatPhone := regFormatHp.ReplaceAllString(phone, "628")
+	formatPhone := regFormatHp.ReplaceAllString(strings.Replace(phone, " ", "", -1), "628")
 	return formatPhone
 }
 
@@ -84,4 +86,23 @@ func TrimWhitespace(v interface{}) {
 			}
 		}
 	}
+}
+
+func DisplayDateLayout(date time.Time, layout string) string {
+	return date.Format(layout)
+}
+
+func DisplayDate(date time.Time) string {
+	return date.Format(constant.FormatDateLayout)
+}
+
+func DisplayDatetime(date time.Time) string {
+	return date.Format(constant.FormatDatetimeLayout)
+}
+
+func DisplayBool(data bool, trueText string, falseText string) string {
+	if data {
+		return trueText
+	}
+	return falseText
 }

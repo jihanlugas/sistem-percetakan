@@ -24,6 +24,6 @@ func (m *Company) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Company) BeforeDelete(tx *gorm.DB) (err error) {
-	return tx.Save(m).Error
-}
+//func (m *Company) BeforeDelete(tx *gorm.DB) (err error) {
+//	return tx.Save(m).Error
+//}
