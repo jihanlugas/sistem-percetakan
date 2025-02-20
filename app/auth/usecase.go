@@ -139,13 +139,3 @@ func NewUsecase(userRepository user.Repository, companyRepository company.Reposi
 		usercompanyRepository: usercompanyRepository,
 	}
 }
-
-func IsSaveIDOR(loginUser jwt.UserLogin, companyId string) bool {
-	if loginUser.Role != constant.RoleAdmin {
-		if loginUser.CompanyID != companyId {
-			return true
-		}
-	}
-
-	return false
-}

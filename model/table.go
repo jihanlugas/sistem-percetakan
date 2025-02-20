@@ -215,12 +215,13 @@ type Orderphase struct {
 	DeleteDt  gorm.DeletedAt `gorm:"null" json:"deleteDt"`
 }
 
-type Payment struct {
+type Transaction struct {
 	ID          string         `gorm:"primaryKey" json:"id"`
 	CompanyID   string         `gorm:"not null" json:"companyId"`
 	OrderID     string         `gorm:"not null" json:"orderId"`
 	Name        string         `gorm:"not null" json:"name"`
 	Description string         `gorm:"not null" json:"description"`
+	Type        int64          `gorm:"not null" json:"type"`
 	Amount      int64          `gorm:"not null" json:"amount"`
 	CreateBy    string         `gorm:"not null" json:"createBy"`
 	CreateDt    time.Time      `gorm:"not null" json:"createDt"`

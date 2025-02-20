@@ -3,15 +3,15 @@ package order
 import (
 	"errors"
 	"fmt"
-	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
 	"github.com/jihanlugas/sistem-percetakan/app/design"
 	"github.com/jihanlugas/sistem-percetakan/app/finishing"
 	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
 	"github.com/jihanlugas/sistem-percetakan/app/other"
-	"github.com/jihanlugas/sistem-percetakan/app/payment"
 	"github.com/jihanlugas/sistem-percetakan/app/phase"
 	"github.com/jihanlugas/sistem-percetakan/app/print"
+	"github.com/jihanlugas/sistem-percetakan/app/transaction"
+	"github.com/jihanlugas/sistem-percetakan/constant"
 	"github.com/jihanlugas/sistem-percetakan/db"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/model"
@@ -28,22 +28,22 @@ type Usecase interface {
 	Create(loginUser jwt.UserLogin, req request.CreateOrder) error
 	Update(loginUser jwt.UserLogin, id string, req request.UpdateOrder) error
 	AddPhase(loginUser jwt.UserLogin, id string, req request.AddPhase) error
-	AddPayment(loginUser jwt.UserLogin, id string, req request.AddPayment) error
+	AddTransaction(loginUser jwt.UserLogin, id string, req request.AddTransaction) error
 	Delete(loginUser jwt.UserLogin, id string) error
 	GenerateSpk(id string) (pdf *gofpdf.Fpdf, vOrder model.OrderView, err error)
 	GenerateInvoice(id string) (pdf *gofpdf.Fpdf, vOrder model.OrderView, err error)
 }
 
 type usecase struct {
-	repository           Repository
-	repositoryDesign     design.Repository
-	repositoryPrint      print.Repository
-	repositoryFinishing  finishing.Repository
-	repositoryOther      other.Repository
-	repositoryOrderphase orderphase.Repository
-	repositoryCustomer   customer.Repository
-	repositoryPhase      phase.Repository
-	repositoryPayment    payment.Repository
+	repository            Repository
+	repositoryDesign      design.Repository
+	repositoryPrint       print.Repository
+	repositoryFinishing   finishing.Repository
+	repositoryOther       other.Repository
+	repositoryOrderphase  orderphase.Repository
+	repositoryCustomer    customer.Repository
+	repositoryPhase       phase.Repository
+	repositoryTransaction transaction.Repository
 }
 
 func (u usecase) Page(loginUser jwt.UserLogin, req request.PageOrder) (vOrders []model.OrderView, count int64, err error) {
@@ -67,7 +67,7 @@ func (u usecase) GetById(loginUser jwt.UserLogin, id string, preloads ...string)
 		return vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, vOrder.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, vOrder.CompanyID) {
 		return vOrder, errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -162,7 +162,7 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdateOr
 		return errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tOrder.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tOrder.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -199,7 +199,7 @@ func (u usecase) AddPhase(loginUser jwt.UserLogin, id string, req request.AddPha
 		return errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tOrder.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tOrder.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -208,7 +208,7 @@ func (u usecase) AddPhase(loginUser jwt.UserLogin, id string, req request.AddPha
 		return errors.New(fmt.Sprint("failed to get phase: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tPhase.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tPhase.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -236,10 +236,10 @@ func (u usecase) AddPhase(loginUser jwt.UserLogin, id string, req request.AddPha
 	return err
 }
 
-func (u usecase) AddPayment(loginUser jwt.UserLogin, id string, req request.AddPayment) error {
+func (u usecase) AddTransaction(loginUser jwt.UserLogin, id string, req request.AddTransaction) error {
 	var err error
 	var tOrder model.Order
-	var tPayment model.Payment
+	var tTransaction model.Transaction
 
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
@@ -249,25 +249,26 @@ func (u usecase) AddPayment(loginUser jwt.UserLogin, id string, req request.AddP
 		return errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tOrder.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tOrder.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
 	tx := conn.Begin()
 
-	tPayment = model.Payment{
+	tTransaction = model.Transaction{
 		ID:          utils.GetUniqueID(),
 		CompanyID:   loginUser.CompanyID,
 		OrderID:     tOrder.ID,
 		Name:        req.Name,
 		Amount:      req.Amount,
 		Description: req.Description,
+		Type:        constant.TRANSACTION_TYPE_DEBIT,
 		CreateBy:    loginUser.UserID,
 		UpdateBy:    loginUser.UserID,
 	}
-	err = u.repositoryPayment.Create(tx, tPayment)
+	err = u.repositoryTransaction.Create(tx, tTransaction)
 	if err != nil {
-		return errors.New(fmt.Sprint("failed to create payment: ", err))
+		return errors.New(fmt.Sprint("failed to create transaction: ", err))
 	}
 
 	err = tx.Commit().Error
@@ -435,7 +436,7 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 		return errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tOrder.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tOrder.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -920,7 +921,7 @@ func (u usecase) GenerateInvoice(id string) (pdf *gofpdf.Fpdf, vOrder model.Orde
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	preloads := []string{"Designs", "Finishings", "Prints", "Prints.Paper", "Others", "Customer", "Payments"}
+	preloads := []string{"Designs", "Finishings", "Prints", "Prints.Paper", "Others", "Customer", "Transactions"}
 	vOrder, err = u.repository.GetViewById(conn, id, preloads...)
 	if err != nil {
 		return pdf, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
@@ -1030,16 +1031,16 @@ func (u usecase) generateInvoice(vOrder model.OrderView) (pdf *gofpdf.Fpdf) {
 	return pdf
 }
 
-func NewUsecase(repository Repository, repositoryDesign design.Repository, repositoryPrint print.Repository, repositoryFinishing finishing.Repository, repositoryOther other.Repository, repositoryOrderphase orderphase.Repository, repositoryCustomer customer.Repository, repositoryPhase phase.Repository, repositoryPayment payment.Repository) Usecase {
+func NewUsecase(repository Repository, repositoryDesign design.Repository, repositoryPrint print.Repository, repositoryFinishing finishing.Repository, repositoryOther other.Repository, repositoryOrderphase orderphase.Repository, repositoryCustomer customer.Repository, repositoryPhase phase.Repository, repositoryTransaction transaction.Repository) Usecase {
 	return &usecase{
-		repository:           repository,
-		repositoryDesign:     repositoryDesign,
-		repositoryPrint:      repositoryPrint,
-		repositoryFinishing:  repositoryFinishing,
-		repositoryOther:      repositoryOther,
-		repositoryOrderphase: repositoryOrderphase,
-		repositoryCustomer:   repositoryCustomer,
-		repositoryPhase:      repositoryPhase,
-		repositoryPayment:    repositoryPayment,
+		repository:            repository,
+		repositoryDesign:      repositoryDesign,
+		repositoryPrint:       repositoryPrint,
+		repositoryFinishing:   repositoryFinishing,
+		repositoryOther:       repositoryOther,
+		repositoryOrderphase:  repositoryOrderphase,
+		repositoryCustomer:    repositoryCustomer,
+		repositoryPhase:       repositoryPhase,
+		repositoryTransaction: repositoryTransaction,
 	}
 }

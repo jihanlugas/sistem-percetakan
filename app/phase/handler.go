@@ -1,7 +1,6 @@
 package phase
 
 import (
-	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/response"
@@ -52,7 +51,7 @@ func (h Handler) Page(c echo.Context) error {
 	if req.CompanyID == "" {
 		req.CompanyID = loginUser.CompanyID
 	} else {
-		if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+		if jwt.IsSaveCompanyIDOR(loginUser, req.CompanyID) {
 			return response.Error(http.StatusBadRequest, response.ErrorHandlerIDOR, err, nil).SendJSON(c)
 		}
 	}

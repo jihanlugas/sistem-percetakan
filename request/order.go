@@ -4,15 +4,17 @@ import "time"
 
 type PageOrder struct {
 	Paging
-	CompanyID   string     `json:"companyId" form:"companyId" query:"companyId"`
-	Preloads    string     `json:"preloads" form:"preloads" query:"preloads"`
-	CustomerID  string     `json:"customerId" form:"customerId" query:"customerId"`
-	PhaseID     string     `json:"phaseId" form:"phaseId" query:"phaseId"`
-	Name        string     `json:"name" form:"name" query:"name"`
-	Description string     `json:"description" form:"description" query:"description"`
-	IsDone      *bool      `json:"isDone" form:"isDone" query:"isDone"`
-	StartDt     *time.Time `json:"startDt" form:"startDt" query:"startDt"`
-	EndDt       *time.Time `json:"endDt" form:"endDt" query:"endDt"`
+	CompanyID       string     `json:"companyId" form:"companyId" query:"companyId"`
+	Preloads        string     `json:"preloads" form:"preloads" query:"preloads"`
+	CustomerID      string     `json:"customerId" form:"customerId" query:"customerId"`
+	PhaseID         string     `json:"phaseId" form:"phaseId" query:"phaseId"`
+	Name            string     `json:"name" form:"name" query:"name"`
+	Description     string     `json:"description" form:"description" query:"description"`
+	IsDone          *bool      `json:"isDone" form:"isDone" query:"isDone"`
+	StartDt         *time.Time `json:"startDt" form:"startDt" query:"startDt"`
+	EndDt           *time.Time `json:"endDt" form:"endDt" query:"endDt"`
+	StartTotalOrder *int64     `json:"startTotalOrder" form:"startTotalOrder" query:"startTotalOrder"`
+	EndTotalOrder   *int64     `json:"endTotalOrder" form:"endTotalOrder" query:"endTotalOrder"`
 }
 
 type CreateOrder struct {
@@ -74,7 +76,7 @@ type AddPhase struct {
 	OrderphaseID string `json:"orderphaseId" form:"orderphaseId" query:"orderphaseId" validate:"required"`
 }
 
-type AddPayment struct {
+type AddTransaction struct {
 	Name        string `json:"name" form:"name" query:"name" validate:"required"`
 	Description string `json:"description" form:"description" query:"description" validate:""`
 	Amount      int64  `json:"amount" form:"amount" query:"amount" validate:"required"`

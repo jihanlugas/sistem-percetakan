@@ -16,7 +16,7 @@ const (
 	VIEW_PAPER       = "papers_view"
 	VIEW_PHASE       = "phases_view"
 	VIEW_ORDERPHASE  = "orderphases_view"
-	VIEW_PAYMENT     = "payments_view"
+	VIEW_TRANSACTION = "transactions_view"
 )
 
 type UserLogin struct {

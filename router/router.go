@@ -12,9 +12,9 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
 	"github.com/jihanlugas/sistem-percetakan/app/other"
 	"github.com/jihanlugas/sistem-percetakan/app/paper"
-	"github.com/jihanlugas/sistem-percetakan/app/payment"
 	"github.com/jihanlugas/sistem-percetakan/app/phase"
 	"github.com/jihanlugas/sistem-percetakan/app/print"
+	"github.com/jihanlugas/sistem-percetakan/app/transaction"
 	"github.com/jihanlugas/sistem-percetakan/app/user"
 	"github.com/jihanlugas/sistem-percetakan/app/usercompany"
 	"github.com/jihanlugas/sistem-percetakan/config"
@@ -44,10 +44,11 @@ func Init() *echo.Echo {
 	customerRepository := customer.NewRepository()
 	paperRepository := paper.NewRepository()
 	phaseRepository := phase.NewRepository()
-	paymentRepository := payment.NewRepository()
+	transactionRepository := transaction.NewRepository()
 
 	authUsecase := auth.NewUsecase(userRepository, companyRepository, usercompanyRepository)
-	orderUsecase := order.NewUsecase(orderRepository, designRepository, printRepository, finishingRepository, otherRepository, orderphaseRepository, customerRepository, phaseRepository, paymentRepository)
+	userUsecase := user.NewUsecase(userRepository, usercompanyRepository)
+	orderUsecase := order.NewUsecase(orderRepository, designRepository, printRepository, finishingRepository, otherRepository, orderphaseRepository, customerRepository, phaseRepository, transactionRepository)
 	customerUsecase := customer.NewUsecase(customerRepository)
 	paperUsecase := paper.NewUsecase(paperRepository)
 	phaseUsecase := phase.NewUsecase(phaseRepository)
@@ -55,9 +56,10 @@ func Init() *echo.Echo {
 	printUsecase := print.NewUsecase(printRepository)
 	finishingUsecase := finishing.NewUsecase(finishingRepository)
 	otherUsecase := other.NewUsecase(otherRepository)
-	paymentUsecase := payment.NewUsecase(paymentRepository)
+	transactionUsecase := transaction.NewUsecase(transactionRepository)
 
 	authHandler := auth.NewHandler(authUsecase)
+	userHandler := user.NewHandler(userUsecase)
 	orderHandler := order.NewHandler(orderUsecase)
 	customerHandler := customer.NewHandler(customerUsecase)
 	paperHandler := paper.NewHandler(paperUsecase)
@@ -66,7 +68,7 @@ func Init() *echo.Echo {
 	printHandler := print.NewHandler(printUsecase)
 	finishingHandler := finishing.NewHandler(finishingUsecase)
 	otherHandler := other.NewHandler(otherUsecase)
-	paymentHandler := payment.NewHandler(paymentUsecase)
+	transactionHandler := transaction.NewHandler(transactionUsecase)
 
 	if config.Debug {
 		router.GET("/", func(c echo.Context) error {
@@ -82,19 +84,28 @@ func Init() *echo.Echo {
 	routerAuth.POST("/sign-out", authHandler.SignOut)
 	routerAuth.GET("/init", authHandler.Init, checkTokenMiddleware)
 	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
+	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
+
+	routerUser := router.Group("/user", checkTokenMiddleware)
+	routerUser.GET("", userHandler.Page)
+	routerUser.POST("", userHandler.Create)
+	routerUser.POST("/change-password", userHandler.ChangePassword)
+	routerUser.PUT("/:id", userHandler.Update)
+	routerUser.GET("/:id", userHandler.GetById)
+	routerUser.DELETE("/:id", userHandler.Delete)
 
 	routerOrder := router.Group("/order", checkTokenMiddleware)
 	routerOrder.GET("", orderHandler.Page)
 	routerOrder.POST("", orderHandler.Create)
 	routerOrder.GET("/:id", orderHandler.GetById)
-	routerOrder.GET("/:id/spk", orderHandler.GenerateSpk)
+	//routerOrder.GET("/:id/spk", orderHandler.GenerateSpk)
 	//routerOrder.GET("/:id/invoice", orderHandler.GenerateInvoice)
 	routerOrder.PUT("/:id", orderHandler.Update)
 	routerOrder.POST("/:id/add-phase", orderHandler.AddPhase)
-	routerOrder.POST("/:id/add-payment", orderHandler.AddPayment)
+	routerOrder.POST("/:id/add-transaction", orderHandler.AddTransaction)
 	routerOrder.DELETE("/:id", orderHandler.Delete)
 
-	//router.GET("/order/:id/spk", orderHandler.GenerateSPK)
+	router.GET("/order/:id/spk", orderHandler.GenerateSpk)
 	router.GET("/order/:id/invoice", orderHandler.GenerateInvoice)
 
 	routerCustomer := router.Group("/customer", checkTokenMiddleware)
@@ -142,12 +153,12 @@ func Init() *echo.Echo {
 	routerOther.GET("/:id", otherHandler.GetById)
 	routerOther.DELETE("/:id", otherHandler.Delete)
 
-	routerPayment := router.Group("/payment", checkTokenMiddleware)
-	routerPayment.GET("", paymentHandler.Page)
-	routerPayment.POST("", paymentHandler.Create)
-	routerPayment.PUT("/:id", paymentHandler.Update)
-	routerPayment.GET("/:id", paymentHandler.GetById)
-	routerPayment.DELETE("/:id", paymentHandler.Delete)
+	routerTransaction := router.Group("/transaction", checkTokenMiddleware)
+	routerTransaction.GET("", transactionHandler.Page)
+	routerTransaction.POST("", transactionHandler.Create)
+	routerTransaction.PUT("/:id", transactionHandler.Update)
+	routerTransaction.GET("/:id", transactionHandler.GetById)
+	routerTransaction.DELETE("/:id", transactionHandler.Delete)
 
 	return router
 }

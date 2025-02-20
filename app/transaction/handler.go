@@ -1,4 +1,4 @@
-package design
+package transaction
 
 import (
 	"github.com/jihanlugas/sistem-percetakan/jwt"
@@ -21,14 +21,14 @@ func NewHandler(usecase Usecase) Handler {
 }
 
 // Page
-// @Tags Design
+// @Tags Transaction
 // @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Param req query request.PageDesign false "url query string"
+// @Param req query request.PageTransaction false "url query string"
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
-// @Router /design [get]
+// @Router /transaction [get]
 func (h Handler) Page(c echo.Context) error {
 	var err error
 
@@ -37,7 +37,7 @@ func (h Handler) Page(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
 	}
 
-	req := new(request.PageDesign)
+	req := new(request.PageTransaction)
 	if err = c.Bind(req); err != nil {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
 	}
@@ -66,7 +66,7 @@ func (h Handler) Page(c echo.Context) error {
 }
 
 // GetById
-// @Tags Design
+// @Tags Transaction
 // @Security BearerAuth
 // @Accept json
 // @Produce json
@@ -74,7 +74,7 @@ func (h Handler) Page(c echo.Context) error {
 // @Query preloads query string false "preloads"
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
-// @Router /design/{id} [get]
+// @Router /transaction/{id} [get]
 func (h Handler) GetById(c echo.Context) error {
 	var err error
 
@@ -91,23 +91,23 @@ func (h Handler) GetById(c echo.Context) error {
 	preloads := c.QueryParam("preloads")
 	preloadSlice := strings.Split(preloads, ",")
 
-	vDesign, err := h.usecase.GetById(loginUser, id, preloadSlice...)
+	vTransaction, err := h.usecase.GetById(loginUser, id, preloadSlice...)
 	if err != nil {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}
 
-	return response.Success(http.StatusOK, response.SuccessHandler, vDesign).SendJSON(c)
+	return response.Success(http.StatusOK, response.SuccessHandler, vTransaction).SendJSON(c)
 }
 
 // Create
-// @Tags Design
+// @Tags Transaction
 // @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Param req body request.CreateDesign true "json req body"
+// @Param req body request.CreateTransaction true "json req body"
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
-// @Router /design [post]
+// @Router /transaction [post]
 func (h Handler) Create(c echo.Context) error {
 	var err error
 
@@ -116,7 +116,7 @@ func (h Handler) Create(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetUserInfo, err, nil).SendJSON(c)
 	}
 
-	req := new(request.CreateDesign)
+	req := new(request.CreateTransaction)
 	if err = c.Bind(req); err != nil {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
 	}
@@ -141,15 +141,15 @@ func (h Handler) Create(c echo.Context) error {
 }
 
 // Update
-// @Tags Design
+// @Tags Transaction
 // @Security BearerAuth
 // @Accept json
 // @Produce json
 // @Param id path string true "ID"
-// @Param req body request.UpdateDesign true "json req body"
+// @Param req body request.UpdateTransaction true "json req body"
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
-// @Router /design/{id} [put]
+// @Router /transaction/{id} [put]
 func (h Handler) Update(c echo.Context) error {
 	var err error
 
@@ -163,7 +163,7 @@ func (h Handler) Update(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
 	}
 
-	req := new(request.UpdateDesign)
+	req := new(request.UpdateTransaction)
 	if err = c.Bind(req); err != nil {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
 	}
@@ -184,14 +184,14 @@ func (h Handler) Update(c echo.Context) error {
 }
 
 // Delete
-// @Tags Design
+// @Tags Transaction
 // @Security BearerAuth
 // @Accept json
 // @Produce json
 // @Param id path string true "ID"
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
-// @Router /design/{id} [delete]
+// @Router /transaction/{id} [delete]
 func (h Handler) Delete(c echo.Context) error {
 	var err error
 

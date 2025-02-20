@@ -6,12 +6,12 @@ import (
 	"time"
 )
 
-var PreloadPayment = []string{
+var PreloadTransaction = []string{
 	"Company",
 	"Order",
 }
 
-func (m *Payment) BeforeCreate(tx *gorm.DB) (err error) {
+func (m *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
 	if m.ID == "" {
@@ -23,12 +23,12 @@ func (m *Payment) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-func (m *Payment) BeforeUpdate(tx *gorm.DB) (err error) {
+func (m *Transaction) BeforeUpdate(tx *gorm.DB) (err error) {
 	now := time.Now()
 	m.UpdateDt = now
 	return
 }
 
-//func (m *Payment) BeforeDelete(tx *gorm.DB) (err error) {
+//func (m *Transaction) BeforeDelete(tx *gorm.DB) (err error) {
 //	return tx.Save(m).Error
 //}

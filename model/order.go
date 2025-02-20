@@ -15,7 +15,7 @@ var PreloadOrder = []string{
 	"Finishings",
 	"Others",
 	"Orderphases",
-	"Payments",
+	"Transactions",
 }
 
 func (m *Order) BeforeCreate(tx *gorm.DB) (err error) {

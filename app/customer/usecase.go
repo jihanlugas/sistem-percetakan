@@ -3,7 +3,6 @@ package customer
 import (
 	"errors"
 	"fmt"
-	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/db"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/model"
@@ -45,7 +44,7 @@ func (u usecase) GetById(loginUser jwt.UserLogin, id string, preloads ...string)
 		return vCustomer, errors.New(fmt.Sprint("failed to get customer: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, vCustomer.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, vCustomer.CompanyID) {
 		return vCustomer, errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -98,7 +97,7 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdateCu
 		return errors.New(fmt.Sprint("failed to get customer: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tCustomer.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tCustomer.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -135,7 +134,7 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 		return errors.New(fmt.Sprint("failed to get customer: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tCustomer.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tCustomer.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 

@@ -8,10 +8,11 @@ import (
 )
 
 type Repository interface {
-	GetById(conn *gorm.DB, id string) (tUsercompany model.Usercompany, err error)
+	GetTableById(conn *gorm.DB, id string) (tUsercompany model.Usercompany, err error)
 	GetCreatorByCompanyId(conn *gorm.DB, companyID string) (tUsercompany model.Usercompany, err error)
 	GetCompanyDefaultByUserId(conn *gorm.DB, userID string) (tUsercompany model.Usercompany, err error)
 	GetViewById(conn *gorm.DB, id string) (vUsercompany model.UsercompanyView, err error)
+	GetViewByUserIdAndCompanyId(conn *gorm.DB, userID, companyID string) (vUsercompany model.UsercompanyView, err error)
 	GetViewCreatorByCompanyId(conn *gorm.DB, companyID string) (vUsercompany model.UsercompanyView, err error)
 	GetViewCompanyDefaultByUserId(conn *gorm.DB, userID string) (vUsercompany model.UsercompanyView, err error)
 	Create(conn *gorm.DB, tUsercompany model.Usercompany) error
@@ -24,7 +25,7 @@ type Repository interface {
 type repository struct {
 }
 
-func (r repository) GetById(conn *gorm.DB, id string) (tUsercompany model.Usercompany, err error) {
+func (r repository) GetTableById(conn *gorm.DB, id string) (tUsercompany model.Usercompany, err error) {
 	err = conn.Where("id = ? ", id).First(&tUsercompany).Error
 	return tUsercompany, err
 }
@@ -45,6 +46,13 @@ func (r repository) GetCompanyDefaultByUserId(conn *gorm.DB, userID string) (tUs
 
 func (r repository) GetViewById(conn *gorm.DB, id string) (vUsercompany model.UsercompanyView, err error) {
 	err = conn.Where("id = ? ", id).First(&vUsercompany).Error
+	return vUsercompany, err
+}
+
+func (r repository) GetViewByUserIdAndCompanyId(conn *gorm.DB, userID, companyID string) (vUsercompany model.UsercompanyView, err error) {
+	err = conn.Where("user_id = ? ", userID).
+		Where("company_id = ? ", companyID).
+		First(&vUsercompany).Error
 	return vUsercompany, err
 }
 

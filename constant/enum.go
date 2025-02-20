@@ -17,4 +17,7 @@ const (
 	REF_TABLE_ITEMVARIANT RefTable = "itemvariant"
 	REF_TABLE_ADDON       RefTable = "addon"
 	REF_TABLE_USER        RefTable = "user"
+
+	TRANSACTION_TYPE_DEBIT  int64 = 1
+	TRANSACTION_TYPE_KREDIT int64 = -1
 )

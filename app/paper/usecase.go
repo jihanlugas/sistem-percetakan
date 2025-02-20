@@ -3,7 +3,6 @@ package paper
 import (
 	"errors"
 	"fmt"
-	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/db"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/model"
@@ -45,7 +44,7 @@ func (u usecase) GetById(loginUser jwt.UserLogin, id string, preloads ...string)
 		return vPaper, errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, vPaper.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, vPaper.CompanyID) {
 		return vPaper, errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -59,7 +58,7 @@ func (u usecase) Create(loginUser jwt.UserLogin, req request.CreatePaper) error 
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, req.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -101,7 +100,7 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdatePa
 		return errors.New(fmt.Sprint("failed to get design: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tPaper.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tPaper.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -137,7 +136,7 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 		return errors.New(fmt.Sprint("failed to get design: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tPaper.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tPaper.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 

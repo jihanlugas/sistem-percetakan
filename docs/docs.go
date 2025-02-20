@@ -470,6 +470,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "name": "endTotalDesign",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "example": 10,
                         "name": "limit",
                         "in": "query"
@@ -515,6 +520,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "startDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "startTotalDesign",
                         "in": "query"
                     }
                 ],
@@ -747,6 +757,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "name": "endTotalFinishing",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "example": 10,
                         "name": "limit",
                         "in": "query"
@@ -792,6 +807,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "startDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "startTotalFinishing",
                         "in": "query"
                     }
                 ],
@@ -1018,6 +1038,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "name": "endTotalOrder",
+                        "in": "query"
+                    },
+                    {
                         "type": "boolean",
                         "name": "isDone",
                         "in": "query"
@@ -1064,6 +1089,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "startDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "startTotalOrder",
                         "in": "query"
                     }
                 ],
@@ -1252,56 +1282,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/order/{id}/add-payment": {
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Order"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "json req body",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.AddPayment"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/order/{id}/add-phase": {
             "post": {
                 "security": [
@@ -1333,6 +1313,56 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/request.AddPhase"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/order/{id}/add-transaction": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "json req body",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AddTransaction"
                         }
                     }
                 ],
@@ -1478,6 +1508,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "name": "endTotalOther",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "example": 10,
                         "name": "limit",
                         "in": "query"
@@ -1523,6 +1558,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "startDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "startTotalOther",
                         "in": "query"
                     }
                 ],
@@ -1968,273 +2008,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/payment": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Payment"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "name": "companyId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "companyName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "createName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "description",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "example": 10,
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "name",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "orderId",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "orderName",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "example": 1,
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "name": "preloads",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "",
-                        "name": "sortField",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "example": "",
-                        "name": "sortOrder",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Payment"
-                ],
-                "parameters": [
-                    {
-                        "description": "json req body",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.CreatePayment"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/payment/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Payment"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Payment"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "json req body",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.UpdatePayment"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Payment"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/phase": {
             "get": {
                 "security": [
@@ -2366,6 +2139,11 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "name": "endTotalPrint",
+                        "in": "query"
+                    },
+                    {
                         "type": "boolean",
                         "name": "isDuplex",
                         "in": "query"
@@ -2427,6 +2205,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "startDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "startTotalPrint",
                         "in": "query"
                     }
                 ],
@@ -2614,10 +2397,633 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/transaction": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "amount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "companyId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "companyName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "createName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "endAmount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "endDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "orderName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "preloads",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "",
+                        "name": "sortOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "startAmount",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "startDt",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "description": "json req body",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/transaction/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "json req body",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateTransaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "birthPlace",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "companyId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "createName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "email",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "fullname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 10,
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "example": 1,
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "phoneNumber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "preloads",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "",
+                        "name": "sortField",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "",
+                        "name": "sortOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "description": "json req body",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/change-password": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "description": "json req body",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ChangePassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "json req body",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "request.AddPayment": {
+        "request.AddPhase": {
+            "type": "object",
+            "required": [
+                "orderphaseId"
+            ],
+            "properties": {
+                "orderphaseId": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AddTransaction": {
             "type": "object",
             "required": [
                 "amount",
@@ -2635,14 +3041,25 @@ const docTemplate = `{
                 }
             }
         },
-        "request.AddPhase": {
+        "request.ChangePassword": {
             "type": "object",
             "required": [
-                "orderphaseId"
+                "confirmPasswd",
+                "currentPasswd",
+                "passwd"
             ],
             "properties": {
-                "orderphaseId": {
-                    "type": "string"
+                "confirmPasswd": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "currentPasswd": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "passwd": {
+                    "type": "string",
+                    "maxLength": 200
                 }
             }
         },
@@ -2941,32 +3358,6 @@ const docTemplate = `{
                 }
             }
         },
-        "request.CreatePayment": {
-            "type": "object",
-            "required": [
-                "amount",
-                "companyId",
-                "name",
-                "orderId"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "integer"
-                },
-                "companyId": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "orderId": {
-                    "type": "string"
-                }
-            }
-        },
         "request.CreatePrint": {
             "type": "object",
             "required": [
@@ -2988,6 +3379,9 @@ const docTemplate = `{
                 "orderId": {
                     "type": "string"
                 },
+                "pageCount": {
+                    "type": "integer"
+                },
                 "paperId": {
                     "type": "string"
                 },
@@ -2999,6 +3393,78 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.CreateTransaction": {
+            "type": "object",
+            "required": [
+                "amount",
+                "companyId",
+                "name"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "companyId": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "orderId": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.CreateUser": {
+            "type": "object",
+            "required": [
+                "email",
+                "fullname",
+                "passwd",
+                "phoneNumber",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birthDt": {
+                    "type": "string"
+                },
+                "birthPlace": {
+                    "type": "string"
+                },
+                "companyId": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "fullname": {
+                    "type": "string",
+                    "maxLength": 80
+                },
+                "passwd": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 20
                 }
             }
         },
@@ -3152,24 +3618,6 @@ const docTemplate = `{
                 }
             }
         },
-        "request.UpdatePayment": {
-            "type": "object",
-            "required": [
-                "amount",
-                "name"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "request.UpdatePrint": {
             "type": "object",
             "required": [
@@ -3185,6 +3633,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "pageCount": {
+                    "type": "integer"
+                },
                 "paperId": {
                     "type": "string"
                 },
@@ -3196,6 +3647,63 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "request.UpdateTransaction": {
+            "type": "object",
+            "required": [
+                "amount",
+                "name"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.UpdateUser": {
+            "type": "object",
+            "required": [
+                "email",
+                "fullname",
+                "phoneNumber",
+                "username"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "birthDt": {
+                    "type": "string"
+                },
+                "birthPlace": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string",
+                    "maxLength": 200
+                },
+                "fullname": {
+                    "type": "string",
+                    "maxLength": 80
+                },
+                "phoneNumber": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 20
                 }
             }
         },

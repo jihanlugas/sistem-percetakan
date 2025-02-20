@@ -103,6 +103,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageDesign) (vDesigns []mode
 	if req.EndDt != nil {
 		query = query.Where("create_dt <= ?", req.EndDt)
 	}
+	if req.StartTotalDesign != nil {
+		query = query.Where("total >= ?", req.StartTotalDesign)
+	}
+	if req.EndTotalDesign != nil {
+		query = query.Where("total <= ?", req.EndTotalDesign)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {

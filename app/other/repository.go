@@ -103,6 +103,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageOther) (vOthers []model.
 	if req.EndDt != nil {
 		query = query.Where("create_dt <= ?", req.EndDt)
 	}
+	if req.StartTotalOther != nil {
+		query = query.Where("total >= ?", req.StartTotalOther)
+	}
+	if req.EndTotalOther != nil {
+		query = query.Where("total <= ?", req.EndTotalOther)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {

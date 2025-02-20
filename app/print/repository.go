@@ -112,6 +112,12 @@ func (r repositoryy) Page(conn *gorm.DB, req request.PagePrint) (vPrints []model
 	if req.EndDt != nil {
 		query = query.Where("create_dt <= ?", req.EndDt)
 	}
+	if req.StartTotalPrint != nil {
+		query = query.Where("total >= ?", req.StartTotalPrint)
+	}
+	if req.EndTotalPrint != nil {
+		query = query.Where("total <= ?", req.EndTotalPrint)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {

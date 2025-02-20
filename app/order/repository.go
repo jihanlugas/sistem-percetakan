@@ -97,6 +97,12 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 	if req.EndDt != nil {
 		query = query.Where("create_dt <= ?", req.EndDt)
 	}
+	if req.StartTotalOrder != nil {
+		query = query.Where("total_order >= ?", req.StartTotalOrder)
+	}
+	if req.EndTotalOrder != nil {
+		query = query.Where("total_order <= ?", req.EndTotalOrder)
+	}
 
 	err = query.Count(&count).Error
 	if err != nil {

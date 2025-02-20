@@ -86,7 +86,7 @@ func dbUpTable() {
 	if err != nil {
 		panic(err)
 	}
-	err = conn.Migrator().AutoMigrate(&model.Payment{})
+	err = conn.Migrator().AutoMigrate(&model.Transaction{})
 	if err != nil {
 		panic(err)
 	}
@@ -119,7 +119,8 @@ func dbUpView() {
 		panic(err)
 	}
 	vUser := conn.Model(&model.User{}).Unscoped().
-		Select("users.*, photos.photo_path as photo_url, u1.fullname as create_name, u2.fullname as update_name").
+		Select("users.*, usercompanies.id as usercompany_id, usercompanies.company_id as company_id, photos.photo_path as photo_url, u1.fullname as create_name, u2.fullname as update_name").
+		Joins("left join usercompanies usercompanies on usercompanies.user_id = users.id").
 		Joins("left join photos photos on photos.id = users.photo_id").
 		Joins("left join users u1 on u1.id = users.create_by").
 		Joins("left join users u2 on u2.id = users.update_by")
@@ -199,9 +200,9 @@ func dbUpView() {
 			", coalesce(prints.total_print, 0) as total_print" +
 			", coalesce(finishings.total_finishing, 0) as total_finishing" +
 			", coalesce(others.total_other, 0) as total_other" +
-			", coalesce(payments.total_payment, 0) as total_payment" +
+			", coalesce(transactions.total_transaction, 0) as total_transaction" +
 			", coalesce(designs.total_design, 0) + coalesce(prints.total_print, 0) + coalesce(finishings.total_finishing, 0) + coalesce(others.total_other, 0) as total_order" +
-			", coalesce(designs.total_design, 0) + coalesce(prints.total_print, 0) + coalesce(finishings.total_finishing, 0) + coalesce(others.total_other, 0) - coalesce(payments.total_payment, 0) as outstanding" +
+			", coalesce(designs.total_design, 0) + coalesce(prints.total_print, 0) + coalesce(finishings.total_finishing, 0) + coalesce(others.total_other, 0) - coalesce(transactions.total_transaction, 0) as outstanding" +
 			", companies.name as company_name, customers.name as customer_name, u1.fullname as create_name, u2.fullname as update_name").
 		Joins("left join orderphases orderphases on orderphases.order_id = orders.id " +
 			"AND orderphases.create_dt = (select max(orderphases.create_dt) from orderphases where orderphases.order_id = orders.id) " +
@@ -231,11 +232,11 @@ func dbUpView() {
 			"group by o.order_id " +
 			") as others on others.order_id = orders.id").
 		Joins("left join ( " +
-			"select p.order_id, COALESCE(sum(p.amount), 0) as total_payment " +
-			"from payments p " +
+			"select p.order_id, COALESCE(sum(p.amount), 0) as total_transaction " +
+			"from transactions p " +
 			"where p.delete_dt is null " +
 			"group by p.order_id " +
-			") as payments on payments.order_id = orders.id").
+			") as transactions on transactions.order_id = orders.id").
 		Joins("left join companies companies on companies.id = orders.company_id").
 		Joins("left join customers customers on customers.id = orders.customer_id").
 		Joins("left join users u1 on u1.id = orders.create_by").
@@ -363,7 +364,7 @@ func dbUpView() {
 		panic(err)
 	}
 	vOrderphase := conn.Model(&model.Orderphase{}).Unscoped().
-		Select("orderphases.*, companies.name as company_name, orderphases.name as orderphase_name, u1.fullname as create_name, u2.fullname as update_name").
+		Select("orderphases.*, companies.name as company_name, orders.name as order_name, u1.fullname as create_name, u2.fullname as update_name").
 		Joins("left join companies companies on companies.id = orderphases.company_id").
 		Joins("left join orders orders on orders.id = orderphases.order_id").
 		Joins("left join users u1 on u1.id = orderphases.create_by").
@@ -377,20 +378,20 @@ func dbUpView() {
 		panic(err)
 	}
 
-	err = conn.Migrator().DropView(model.VIEW_PAYMENT)
+	err = conn.Migrator().DropView(model.VIEW_TRANSACTION)
 	if err != nil {
 		panic(err)
 	}
-	vPayment := conn.Model(&model.Payment{}).Unscoped().
-		Select("payments.*, companies.name as company_name, payments.name as payment_name, u1.fullname as create_name, u2.fullname as update_name").
-		Joins("left join companies companies on companies.id = payments.company_id").
-		Joins("left join orders orders on orders.id = payments.order_id").
-		Joins("left join users u1 on u1.id = payments.create_by").
-		Joins("left join users u2 on u2.id = payments.update_by")
+	vTransaction := conn.Model(&model.Transaction{}).Unscoped().
+		Select("transactions.*, companies.name as company_name, orders.name as order_name, u1.fullname as create_name, u2.fullname as update_name").
+		Joins("left join companies companies on companies.id = transactions.company_id").
+		Joins("left join orders orders on orders.id = transactions.order_id").
+		Joins("left join users u1 on u1.id = transactions.create_by").
+		Joins("left join users u2 on u2.id = transactions.update_by")
 
-	err = conn.Migrator().CreateView(model.VIEW_PAYMENT, gorm.ViewOption{
+	err = conn.Migrator().CreateView(model.VIEW_TRANSACTION, gorm.ViewOption{
 		Replace: true,
-		Query:   vPayment,
+		Query:   vTransaction,
 	})
 	if err != nil {
 		panic(err)
@@ -779,7 +780,7 @@ func dbSeed() {
 	}
 	tx.Create(&others)
 
-	payments := []model.Payment{
+	transactions := []model.Transaction{
 		{
 			ID:          utils.GetUniqueID(),
 			CompanyID:   demoCompanyID,
@@ -801,7 +802,7 @@ func dbSeed() {
 			UpdateBy:    userID,
 		},
 	}
-	tx.Create(&payments)
+	tx.Create(&transactions)
 
 	orderphases := []model.Orderphase{
 		{

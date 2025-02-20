@@ -122,3 +122,13 @@ func parseToken(token string) (jwt.MapClaims, error) {
 
 	return claims, nil
 }
+
+func IsSaveCompanyIDOR(loginUser UserLogin, companyId string) bool {
+	if loginUser.Role != constant.RoleAdmin {
+		if loginUser.CompanyID != companyId {
+			return true
+		}
+	}
+
+	return false
+}

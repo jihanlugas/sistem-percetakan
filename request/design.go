@@ -4,16 +4,18 @@ import "time"
 
 type PageDesign struct {
 	Paging
-	CompanyID   string     `json:"companyId" form:"companyId" query:"companyId"`
-	OrderID     string     `json:"orderId" form:"orderId" query:"orderId"`
-	Name        string     `json:"name" form:"name" query:"name"`
-	Description string     `json:"description" form:"description" query:"description"`
-	CompanyName string     `json:"companyName" form:"companyName" query:"companyName"`
-	OrderName   string     `json:"orderName" form:"orderName" query:"orderName"`
-	CreateName  string     `json:"createName" form:"createName" query:"createName"`
-	Preloads    string     `json:"preloads" form:"preloads" query:"preloads"`
-	StartDt     *time.Time `json:"startDt" form:"startDt" query:"startDt"`
-	EndDt       *time.Time `json:"endDt" form:"endDt" query:"endDt"`
+	CompanyID        string     `json:"companyId" form:"companyId" query:"companyId"`
+	OrderID          string     `json:"orderId" form:"orderId" query:"orderId"`
+	Name             string     `json:"name" form:"name" query:"name"`
+	Description      string     `json:"description" form:"description" query:"description"`
+	CompanyName      string     `json:"companyName" form:"companyName" query:"companyName"`
+	OrderName        string     `json:"orderName" form:"orderName" query:"orderName"`
+	CreateName       string     `json:"createName" form:"createName" query:"createName"`
+	Preloads         string     `json:"preloads" form:"preloads" query:"preloads"`
+	StartDt          *time.Time `json:"startDt" form:"startDt" query:"startDt"`
+	EndDt            *time.Time `json:"endDt" form:"endDt" query:"endDt"`
+	StartTotalDesign *int64     `json:"startTotalDesign" form:"startTotalDesign" query:"startTotalDesign"`
+	EndTotalDesign   *int64     `json:"endTotalDesign" form:"endTotalDesign" query:"endTotalDesign"`
 }
 
 type CreateDesign struct {

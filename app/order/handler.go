@@ -3,7 +3,6 @@ package order
 import (
 	"bytes"
 	"fmt"
-	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/response"
@@ -56,7 +55,7 @@ func (h Handler) Page(c echo.Context) error {
 	if req.CompanyID == "" {
 		req.CompanyID = loginUser.CompanyID
 	} else {
-		if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+		if jwt.IsSaveCompanyIDOR(loginUser, req.CompanyID) {
 			return response.Error(http.StatusBadRequest, response.ErrorHandlerIDOR, err, nil).SendJSON(c)
 		}
 	}
@@ -206,7 +205,7 @@ func (h Handler) Create(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
 	}
 
-	if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, req.CompanyID) {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerIDOR, err, nil).SendJSON(c)
 	}
 
@@ -304,17 +303,17 @@ func (h Handler) AddPhase(c echo.Context) error {
 	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
 }
 
-// AddPayment
+// AddTransaction
 // @Tags Order
 // @Security BearerAuth
 // @Accept json
 // @Produce json
 // @Param id path string true "ID"
-// @Param req body request.AddPayment true "json req body"
+// @Param req body request.AddTransaction true "json req body"
 // @Success      200  {object}	response.Response
 // @Failure      500  {object}  response.Response
-// @Router /order/{id}/add-payment [post]
-func (h Handler) AddPayment(c echo.Context) error {
+// @Router /order/{id}/add-transaction [post]
+func (h Handler) AddTransaction(c echo.Context) error {
 	var err error
 
 	loginUser, err := jwt.GetUserLoginInfo(c)
@@ -327,7 +326,7 @@ func (h Handler) AddPayment(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
 	}
 
-	req := new(request.AddPayment)
+	req := new(request.AddTransaction)
 	if err = c.Bind(req); err != nil {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerBind, err, nil).SendJSON(c)
 	}
@@ -339,7 +338,7 @@ func (h Handler) AddPayment(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerFailedValidation, err, response.ValidationError(err)).SendJSON(c)
 	}
 
-	err = h.usecase.AddPayment(loginUser, id, *req)
+	err = h.usecase.AddTransaction(loginUser, id, *req)
 	if err != nil {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}

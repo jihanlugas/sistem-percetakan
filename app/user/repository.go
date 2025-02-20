@@ -6,17 +6,18 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Repository interface {
-	GetById(conn *gorm.DB, id string) (tUser model.User, err error)
-	GetByUsername(conn *gorm.DB, username string) (tUser model.User, err error)
-	GetByEmail(conn *gorm.DB, email string) (tUser model.User, err error)
-	GetByPhoneNumber(conn *gorm.DB, phoneNumber string) (tUser model.User, err error)
-	GetViewById(conn *gorm.DB, id string) (vUser model.UserView, err error)
-	GetViewByUsername(conn *gorm.DB, username string) (vUser model.UserView, err error)
-	GetViewByEmail(conn *gorm.DB, email string) (vUser model.UserView, err error)
-	GetViewByPhoneNumber(conn *gorm.DB, phoneNumber string) (vUser model.UserView, err error)
+	GetTableById(conn *gorm.DB, id string, preloads ...string) (tUser model.User, err error)
+	GetByUsername(conn *gorm.DB, username string, preloads ...string) (tUser model.User, err error)
+	GetByEmail(conn *gorm.DB, email string, preloads ...string) (tUser model.User, err error)
+	GetByPhoneNumber(conn *gorm.DB, phoneNumber string, preloads ...string) (tUser model.User, err error)
+	GetViewById(conn *gorm.DB, id string, preloads ...string) (vUser model.UserView, err error)
+	GetViewByUsername(conn *gorm.DB, username string, preloads ...string) (vUser model.UserView, err error)
+	GetViewByEmail(conn *gorm.DB, email string, preloads ...string) (vUser model.UserView, err error)
+	GetViewByPhoneNumber(conn *gorm.DB, phoneNumber string, preloads ...string) (vUser model.UserView, err error)
 	Create(conn *gorm.DB, tUser model.User) error
 	Update(conn *gorm.DB, tUser model.User) error
 	Save(conn *gorm.DB, tUser model.User) error
@@ -27,42 +28,66 @@ type Repository interface {
 type repository struct {
 }
 
-func (r repository) GetById(conn *gorm.DB, id string) (tUser model.User, err error) {
+func (r repository) GetTableById(conn *gorm.DB, id string, preloads ...string) (tUser model.User, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("id = ? ", id).First(&tUser).Error
 	return tUser, err
 }
 
-func (r repository) GetByUsername(conn *gorm.DB, username string) (tUser model.User, err error) {
+func (r repository) GetByUsername(conn *gorm.DB, username string, preloads ...string) (tUser model.User, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("username = ? ", username).First(&tUser).Error
 	return tUser, err
 }
 
-func (r repository) GetByEmail(conn *gorm.DB, email string) (tUser model.User, err error) {
+func (r repository) GetByEmail(conn *gorm.DB, email string, preloads ...string) (tUser model.User, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("email = ? ", email).First(&tUser).Error
 	return tUser, err
 }
 
-func (r repository) GetByPhoneNumber(conn *gorm.DB, phoneNumber string) (tUser model.User, err error) {
+func (r repository) GetByPhoneNumber(conn *gorm.DB, phoneNumber string, preloads ...string) (tUser model.User, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("no_hp = ? ", utils.FormatPhoneTo62(phoneNumber)).First(&tUser).Error
 	return tUser, err
 }
 
-func (r repository) GetViewById(conn *gorm.DB, id string) (vUser model.UserView, err error) {
+func (r repository) GetViewById(conn *gorm.DB, id string, preloads ...string) (vUser model.UserView, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("id = ? ", id).First(&vUser).Error
 	return vUser, err
 }
 
-func (r repository) GetViewByUsername(conn *gorm.DB, username string) (vUser model.UserView, err error) {
+func (r repository) GetViewByUsername(conn *gorm.DB, username string, preloads ...string) (vUser model.UserView, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("username = ? ", username).First(&vUser).Error
 	return vUser, err
 }
 
-func (r repository) GetViewByEmail(conn *gorm.DB, email string) (vUser model.UserView, err error) {
+func (r repository) GetViewByEmail(conn *gorm.DB, email string, preloads ...string) (vUser model.UserView, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("email = ? ", email).First(&vUser).Error
 	return vUser, err
 }
 
-func (r repository) GetViewByPhoneNumber(conn *gorm.DB, phoneNumber string) (vUser model.UserView, err error) {
+func (r repository) GetViewByPhoneNumber(conn *gorm.DB, phoneNumber string, preloads ...string) (vUser model.UserView, err error) {
+	for _, preload := range preloads {
+		conn = conn.Preload(preload)
+	}
 	err = conn.Where("no_hp = ? ", phoneNumber).First(&vUser).Error
 	return vUser, err
 }
@@ -86,10 +111,20 @@ func (r repository) Delete(conn *gorm.DB, tUser model.User) error {
 func (r repository) Page(conn *gorm.DB, req request.PageUser) (vUsers []model.UserView, count int64, err error) {
 	query := conn.Model(&vUsers)
 
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadCustomer) {
+			query = query.Preload(preload)
+		}
+	}
+
+	// query
 	if req.CompanyID != "" {
 		query = query.Where("company_id = ?", req.CompanyID)
 	}
-
+	if req.Fullname != "" {
+		query = query.Where("fullname ILIKE ?", "%"+req.Fullname+"%")
+	}
 	if req.Email != "" {
 		query = query.Where("email ILIKE ?", "%"+req.Email+"%")
 	}
@@ -99,8 +134,17 @@ func (r repository) Page(conn *gorm.DB, req request.PageUser) (vUsers []model.Us
 	if req.PhoneNumber != "" {
 		query = query.Where("no_hp ILIKE ?", "%"+utils.FormatPhoneTo62(req.PhoneNumber)+"%")
 	}
-	if req.Fullname != "" {
-		query = query.Where("fullname ILIKE ?", "%"+req.Fullname+"%")
+	if req.Username != "" {
+		query = query.Where("username ILIKE ?", "%"+utils.FormatPhoneTo62(req.Username)+"%")
+	}
+	if req.Address != "" {
+		query = query.Where("address ILIKE ?", "%"+utils.FormatPhoneTo62(req.Address)+"%")
+	}
+	if req.BirthPlace != "" {
+		query = query.Where("birth_place ILIKE ?", "%"+utils.FormatPhoneTo62(req.BirthPlace)+"%")
+	}
+	if req.CreateName != "" {
+		query = query.Where("create_name ILIKE ?", "%"+req.CreateName+"%")
 	}
 
 	err = query.Count(&count).Error

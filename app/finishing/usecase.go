@@ -3,7 +3,6 @@ package finishing
 import (
 	"errors"
 	"fmt"
-	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/db"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/model"
@@ -45,7 +44,7 @@ func (u usecase) GetById(loginUser jwt.UserLogin, id string, preloads ...string)
 		return vFinishing, errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, vFinishing.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, vFinishing.CompanyID) {
 		return vFinishing, errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -59,7 +58,7 @@ func (u usecase) Create(loginUser jwt.UserLogin, req request.CreateFinishing) er
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	if auth.IsSaveIDOR(loginUser, req.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, req.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -103,7 +102,7 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdateFi
 		return errors.New(fmt.Sprint("failed to get finishing: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tFinishing.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tFinishing.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
@@ -140,7 +139,7 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 		return errors.New(fmt.Sprint("failed to get finishing: ", err))
 	}
 
-	if auth.IsSaveIDOR(loginUser, tFinishing.CompanyID) {
+	if jwt.IsSaveCompanyIDOR(loginUser, tFinishing.CompanyID) {
 		return errors.New(response.ErrorHandlerIDOR)
 	}
 
