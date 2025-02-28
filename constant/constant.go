@@ -7,8 +7,8 @@ package constant
 const (
 	TokenUserContext     = "usr"
 	TokenContentLen      = 6
-	FormatDateLayout     = "02-01-2006"
-	FormatDatetimeLayout = "02-01-2006 15:04"
+	FormatDateLayout     = "02 January 2006"
+	FormatDatetimeLayout = "02 January 2006 15:04"
 	BearerSchema         = "Bearer"
 	RoleAdmin            = "ADMIN"
 	RoleUseradmin        = "USERADMIN"

@@ -135,7 +135,7 @@ type OrderView struct {
 	CustomerID       string         `json:"customerId"`
 	Name             string         `json:"name"`
 	Description      string         `json:"description"`
-	IsDone           bool           `json:"isDone"`
+	Number           int64          `json:"number"`
 	CreateBy         string         `json:"createBy"`
 	CreateDt         time.Time      `json:"createDt"`
 	UpdateBy         string         `json:"updateBy"`
@@ -175,8 +175,8 @@ type PaperView struct {
 	CompanyID          string         `json:"companyId"`
 	Name               string         `json:"name"`
 	Description        string         `json:"description"`
-	DefaultPrice       int            `json:"defaultPrice"`
-	DefaultPriceDuplex int            `json:"defaultPriceDuplex"`
+	DefaultPrice       int64          `json:"defaultPrice"`
+	DefaultPriceDuplex int64          `json:"defaultPriceDuplex"`
 	CreateBy           string         `json:"createBy"`
 	CreateDt           time.Time      `json:"createDt"`
 	UpdateBy           string         `json:"updateBy"`

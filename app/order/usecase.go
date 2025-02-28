@@ -1,6 +1,7 @@
 package order
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
@@ -18,8 +19,9 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/response"
 	"github.com/jihanlugas/sistem-percetakan/utils"
-	"github.com/jung-kurt/gofpdf"
 	"gorm.io/gorm"
+	"html/template"
+	"os"
 )
 
 type Usecase interface {
@@ -30,8 +32,8 @@ type Usecase interface {
 	AddPhase(loginUser jwt.UserLogin, id string, req request.AddPhase) error
 	AddTransaction(loginUser jwt.UserLogin, id string, req request.AddTransaction) error
 	Delete(loginUser jwt.UserLogin, id string) error
-	GenerateSpk(id string) (pdf *gofpdf.Fpdf, vOrder model.OrderView, err error)
-	GenerateInvoice(id string) (pdf *gofpdf.Fpdf, vOrder model.OrderView, err error)
+	GenerateSpk(id string) (pdfBytes []byte, vOrder model.OrderView, err error)
+	GenerateInvoice(id string) (pdfBytes []byte, vOrder model.OrderView, err error)
 }
 
 type usecase struct {
@@ -107,7 +109,7 @@ func (u usecase) Create(loginUser jwt.UserLogin, req request.CreateOrder) error 
 		CustomerID:  req.CustomerID,
 		Name:        req.Name,
 		Description: req.Description,
-		IsDone:      false,
+		Number:      u.repository.GetNextNumber(tx, req.CompanyID),
 		CreateBy:    loginUser.UserID,
 		UpdateBy:    loginUser.UserID,
 	}
@@ -170,7 +172,6 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdateOr
 
 	tOrder.Name = req.Name
 	tOrder.Description = req.Description
-	tOrder.IsDone = req.IsDone
 	tOrder.UpdateBy = loginUser.UserID
 	err = u.repository.Save(tx, tOrder)
 	if err != nil {
@@ -475,560 +476,116 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 	return err
 }
 
-func (u usecase) GenerateSpk(id string) (pdf *gofpdf.Fpdf, vOrder model.OrderView, err error) {
+func (u usecase) GenerateSpk(id string) (pdfBytes []byte, vOrder model.OrderView, err error) {
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	preloads := []string{"Designs", "Finishings", "Prints", "Prints.Paper", "Others", "Customer"}
+	preloads := []string{"Company", "Designs", "Finishings", "Prints", "Prints.Paper", "Others", "Customer"}
 	vOrder, err = u.repository.GetViewById(conn, id, preloads...)
 	if err != nil {
-		return pdf, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
+		return pdfBytes, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	pdf = u.generateSpk(vOrder)
+	pdfBytes, err = u.generateSpk(vOrder)
 
-	return pdf, vOrder, err
+	return pdfBytes, vOrder, err
 }
 
-func (u usecase) generateSpkDesign(pdf *gofpdf.Fpdf, vDesigns []model.DesignView) {
-	// Header dan data dari parameter
-	const (
-		marginH = 15.0
-		lineHt  = 5.5
-		cellGap = 2.0
-	)
-	// var colStrList [colCount]string
-	type cellType struct {
-		str  string
-		list [][]byte
-		ht   float64
-	}
-	type headerType struct {
-		value string
-		width float64
-		align string
-	}
-	type dataType struct {
-		value string
-	}
-
-	headerData := []headerType{
-		{"No", 10, "C"},
-		{"Nama", 60, ""},
-		{"Description", 70, ""},
-		{"Qty", 40, "R"},
-	} // total width 180
-
-	listData := [][]dataType{}
-	for i, data := range vDesigns {
-		newData := []dataType{
-			{fmt.Sprintf("%d", i+1)},
-			{data.Name},
-			{data.Description},
-			{fmt.Sprintf("%d", i+1)},
-		}
-		listData = append(listData, newData)
-	}
-
-	pdf.SetFont("Arial", "", 12)
-	pdf.Cell(180, 10, "Design")
-	pdf.Ln(10)
-
-	pdf.SetFont("Arial", "B", 10)
-	// Headers
-	pdf.SetTextColor(224, 224, 224)
-	pdf.SetFillColor(128, 128, 128)
-	for _, data := range headerData {
-		pdf.CellFormat(data.width, 10, data.value, "1", 0, "CM", true, 0, "")
-	}
-	pdf.Ln(-1)
-	pdf.SetTextColor(24, 24, 24)
-	pdf.SetFillColor(255, 255, 255)
-
-	// Rows
-	y := pdf.GetY()
-	pdf.SetFont("Arial", "", 10)
-	count := 0
-	for _, dataRow := range listData {
-		var cellList []cellType
-		maxHt := lineHt
-		// Cell height calculation loop
-		for i, dataCell := range dataRow {
-			var cell cellType
-			count++
-			if count > len(dataCell.value) {
-				count = 1
+func (u usecase) generateSpk(vOrder model.OrderView) (pdfBytes []byte, err error) {
+	tmpl := template.New("spk.html").Funcs(template.FuncMap{
+		"displayLembar": func(lembar int64) string {
+			return fmt.Sprintf("%s Lembar", utils.DisplayNumber(lembar))
+		},
+		"displayDuplex": func(isDuplex bool) string {
+			if isDuplex {
+				return "2 Muka"
 			}
-			cell.str = dataCell.value
-			cell.list = pdf.SplitLines([]byte(cell.str), headerData[i].width-cellGap-cellGap)
-			cell.ht = float64(len(cell.list)) * lineHt
-			if cell.ht > maxHt {
-				maxHt = cell.ht
-			}
-			cellList = append(cellList, cell)
-		}
+			return "1 Muka"
+		},
+		"displayDate":        utils.DisplayDate,
+		"displayDatetime":    utils.DisplayDatetime,
+		"displayNumber":      utils.DisplayNumber,
+		"displayMoney":       utils.DisplayMoney,
+		"displayPhoneNumber": utils.DisplayPhoneNumber,
+		"displaySpkNumber":   utils.DisplaySpkNumber,
+	})
 
-		// Cell render loop
-		x := marginH
-		for i := range dataRow {
-			pdf.Rect(x, y, headerData[i].width, maxHt+cellGap+cellGap, "D")
-			cell := cellList[i]
-			cellY := y + cellGap + (maxHt-cell.ht)/2
-			for splitJ := 0; splitJ < len(cell.list); splitJ++ {
-				pdf.SetXY(x+cellGap, cellY)
-				pdf.CellFormat(headerData[i].width-cellGap-cellGap, lineHt, string(cell.list[splitJ]), "", 0, headerData[i].align, false, 0, "")
-				cellY += lineHt
-			}
-			x += headerData[i].width
-		}
-		y += maxHt + cellGap + cellGap
+	// Parse template setelah fungsi didaftarkan
+	tmpl, err = tmpl.ParseFiles("assets/template/spk.html")
+	if err != nil {
+		return pdfBytes, err
 	}
-	pdf.SetXY(marginH, y+5)
+
+	// Render template ke buffer
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, vOrder); err != nil {
+		return pdfBytes, err
+	}
+
+	// Simpan HTML render ke file sementara
+	tempHTMLFile := "temp.html"
+	if err := os.WriteFile(tempHTMLFile, buf.Bytes(), 0644); err != nil {
+		return pdfBytes, err
+	}
+	defer os.Remove(tempHTMLFile)
+
+	return utils.GeneratePDFWithChromedp(tempHTMLFile)
 }
 
-func (u usecase) generateSpkPrint(pdf *gofpdf.Fpdf, vPrints []model.PrintView) {
-	// Header dan data dari parameter
-	const (
-		marginH = 15.0
-		lineHt  = 5.5
-		cellGap = 2.0
-	)
-	// var colStrList [colCount]string
-	type cellType struct {
-		str  string
-		list [][]byte
-		ht   float64
-	}
-	type headerType struct {
-		value string
-		width float64
-		align string
-	}
-	type dataType struct {
-		value string
-	}
-
-	headerData := []headerType{
-		{"No", 10, "C"},
-		{"Nama", 40, ""},
-		{"Description", 45, ""},
-		{"Kertas", 40, ""},
-		{"2 Muka", 15, ""},
-		{"Lembar", 15, "R"},
-		{"Qty", 15, "R"},
-	} // total width 180
-
-	listData := [][]dataType{}
-	for i, data := range vPrints {
-		newData := []dataType{
-			{fmt.Sprintf("%d", i+1)},
-			{data.Name},
-			{data.Description},
-			{data.Paper.Name},
-			{utils.DisplayBool(data.IsDuplex, "Ya", "Tidak")},
-			{fmt.Sprintf("%d", data.PageCount)},
-			{fmt.Sprintf("%d", data.Qty)},
-		}
-		listData = append(listData, newData)
-	}
-
-	pdf.SetFont("Arial", "", 12)
-	pdf.Cell(180, 10, "Print")
-	pdf.Ln(10)
-
-	pdf.SetFont("Arial", "B", 10)
-	// Headers
-	pdf.SetTextColor(224, 224, 224)
-	pdf.SetFillColor(128, 128, 128)
-	for _, data := range headerData {
-		pdf.CellFormat(data.width, 10, data.value, "1", 0, "CM", true, 0, "")
-	}
-	pdf.Ln(-1)
-	pdf.SetTextColor(24, 24, 24)
-	pdf.SetFillColor(255, 255, 255)
-
-	// Rows
-	y := pdf.GetY()
-	pdf.SetFont("Arial", "", 10)
-	count := 0
-	for _, dataRow := range listData {
-		var cellList []cellType
-		maxHt := lineHt
-		// Cell height calculation loop
-		for i, dataCell := range dataRow {
-			var cell cellType
-			count++
-			if count > len(dataCell.value) {
-				count = 1
-			}
-			cell.str = dataCell.value
-			cell.list = pdf.SplitLines([]byte(cell.str), headerData[i].width-cellGap-cellGap)
-			cell.ht = float64(len(cell.list)) * lineHt
-			if cell.ht > maxHt {
-				maxHt = cell.ht
-			}
-			cellList = append(cellList, cell)
-		}
-
-		// Cell render loop
-		x := marginH
-		for i := range dataRow {
-			pdf.Rect(x, y, headerData[i].width, maxHt+cellGap+cellGap, "D")
-			cell := cellList[i]
-			cellY := y + cellGap + (maxHt-cell.ht)/2
-			for splitJ := 0; splitJ < len(cell.list); splitJ++ {
-				pdf.SetXY(x+cellGap, cellY)
-				pdf.CellFormat(headerData[i].width-cellGap-cellGap, lineHt, string(cell.list[splitJ]), "", 0, headerData[i].align, false, 0, "")
-				cellY += lineHt
-			}
-			x += headerData[i].width
-		}
-		y += maxHt + cellGap + cellGap
-	}
-	pdf.SetXY(marginH, y+5)
-}
-
-func (u usecase) generateSpkFinishing(pdf *gofpdf.Fpdf, vFinishings []model.FinishingView) {
-	// Header dan data dari parameter
-	const (
-		marginH = 15.0
-		lineHt  = 5.5
-		cellGap = 2.0
-	)
-	// var colStrList [colCount]string
-	type cellType struct {
-		str  string
-		list [][]byte
-		ht   float64
-	}
-	type headerType struct {
-		value string
-		width float64
-		align string
-	}
-	type dataType struct {
-		value string
-	}
-
-	headerData := []headerType{
-		{"No", 10, "C"},
-		{"Nama", 60, ""},
-		{"Description", 70, ""},
-		{"Qty", 40, "R"},
-	} // total width 180
-
-	listData := [][]dataType{}
-	for i, data := range vFinishings {
-		newData := []dataType{
-			{fmt.Sprintf("%d", i+1)},
-			{data.Name},
-			{data.Description},
-			{fmt.Sprintf("%d", i+1)},
-		}
-		listData = append(listData, newData)
-	}
-
-	pdf.SetFont("Arial", "", 12)
-	pdf.Cell(180, 10, "Finishing")
-	pdf.Ln(10)
-
-	pdf.SetFont("Arial", "B", 10)
-	// Headers
-	pdf.SetTextColor(224, 224, 224)
-	pdf.SetFillColor(128, 128, 128)
-	for _, data := range headerData {
-		pdf.CellFormat(data.width, 10, data.value, "1", 0, "CM", true, 0, "")
-	}
-	pdf.Ln(-1)
-	pdf.SetTextColor(24, 24, 24)
-	pdf.SetFillColor(255, 255, 255)
-
-	// Rows
-	y := pdf.GetY()
-	pdf.SetFont("Arial", "", 10)
-	count := 0
-	for _, dataRow := range listData {
-		var cellList []cellType
-		maxHt := lineHt
-		// Cell height calculation loop
-		for i, dataCell := range dataRow {
-			var cell cellType
-			count++
-			if count > len(dataCell.value) {
-				count = 1
-			}
-			cell.str = dataCell.value
-			cell.list = pdf.SplitLines([]byte(cell.str), headerData[i].width-cellGap-cellGap)
-			cell.ht = float64(len(cell.list)) * lineHt
-			if cell.ht > maxHt {
-				maxHt = cell.ht
-			}
-			cellList = append(cellList, cell)
-		}
-
-		// Cell render loop
-		x := marginH
-		for i := range dataRow {
-			pdf.Rect(x, y, headerData[i].width, maxHt+cellGap+cellGap, "D")
-			cell := cellList[i]
-			cellY := y + cellGap + (maxHt-cell.ht)/2
-			for splitJ := 0; splitJ < len(cell.list); splitJ++ {
-				pdf.SetXY(x+cellGap, cellY)
-				pdf.CellFormat(headerData[i].width-cellGap-cellGap, lineHt, string(cell.list[splitJ]), "", 0, headerData[i].align, false, 0, "")
-				cellY += lineHt
-			}
-			x += headerData[i].width
-		}
-		y += maxHt + cellGap + cellGap
-	}
-	pdf.SetXY(marginH, y+5)
-}
-
-func (u usecase) generateSpkOther(pdf *gofpdf.Fpdf, vOthers []model.OtherView) {
-	// Header dan data dari parameter
-	const (
-		marginH = 15.0
-		lineHt  = 5.5
-		cellGap = 2.0
-	)
-	// var colStrList [colCount]string
-	type cellType struct {
-		str  string
-		list [][]byte
-		ht   float64
-	}
-	type headerType struct {
-		value string
-		width float64
-		align string
-	}
-	type dataType struct {
-		value string
-	}
-
-	headerData := []headerType{
-		{"No", 10, "C"},
-		{"Nama", 60, ""},
-		{"Description", 70, ""},
-		{"Qty", 40, "R"},
-	} // total width 180
-
-	listData := [][]dataType{}
-	for i, data := range vOthers {
-		newData := []dataType{
-			{fmt.Sprintf("%d", i+1)},
-			{data.Name},
-			{data.Description},
-			{fmt.Sprintf("%d", i+1)},
-		}
-		listData = append(listData, newData)
-	}
-
-	pdf.SetFont("Arial", "", 12)
-	pdf.Cell(180, 10, "Other")
-	pdf.Ln(10)
-
-	pdf.SetFont("Arial", "B", 10)
-	// Headers
-	pdf.SetTextColor(224, 224, 224)
-	pdf.SetFillColor(128, 128, 128)
-	for _, data := range headerData {
-		pdf.CellFormat(data.width, 10, data.value, "1", 0, "CM", true, 0, "")
-	}
-	pdf.Ln(-1)
-	pdf.SetTextColor(24, 24, 24)
-	pdf.SetFillColor(255, 255, 255)
-
-	// Rows
-	y := pdf.GetY()
-	pdf.SetFont("Arial", "", 10)
-	count := 0
-	for _, dataRow := range listData {
-		var cellList []cellType
-		maxHt := lineHt
-		// Cell height calculation loop
-		for i, dataCell := range dataRow {
-			var cell cellType
-			count++
-			if count > len(dataCell.value) {
-				count = 1
-			}
-			cell.str = dataCell.value
-			cell.list = pdf.SplitLines([]byte(cell.str), headerData[i].width-cellGap-cellGap)
-			cell.ht = float64(len(cell.list)) * lineHt
-			if cell.ht > maxHt {
-				maxHt = cell.ht
-			}
-			cellList = append(cellList, cell)
-		}
-
-		// Cell render loop
-		x := marginH
-		for i := range dataRow {
-			pdf.Rect(x, y, headerData[i].width, maxHt+cellGap+cellGap, "D")
-			cell := cellList[i]
-			cellY := y + cellGap + (maxHt-cell.ht)/2
-			for splitJ := 0; splitJ < len(cell.list); splitJ++ {
-				pdf.SetXY(x+cellGap, cellY)
-				pdf.CellFormat(headerData[i].width-cellGap-cellGap, lineHt, string(cell.list[splitJ]), "", 0, headerData[i].align, false, 0, "")
-				cellY += lineHt
-			}
-			x += headerData[i].width
-		}
-		y += maxHt + cellGap + cellGap
-	}
-	pdf.SetXY(marginH, y+5)
-}
-
-func (u usecase) generateSpk(vOrder model.OrderView) (pdf *gofpdf.Fpdf) {
-
-	pdf = gofpdf.New("P", "mm", "A4", "") // 210 x 297
-	pdf.SetMargins(15, 15, 15)
-	pdf.AddPage()
-
-	// Judul Surat Perintah Kerja
-	pdf.SetFont("Arial", "B", 16)
-	pdf.Cell(190, 10, "Surat Perintah Kerja")
-	pdf.Ln(12)
-
-	// Informasi pekerjaan
-	pdf.SetFont("Arial", "", 12)
-	pdf.MultiCell(0, 10, "Berikut adalah rincian perintah kerja untuk pencetakan buku dalam bentuk tabel:", "", "", false)
-
-	if len(vOrder.Designs) > 0 {
-		u.generateSpkDesign(pdf, vOrder.Designs)
-	}
-	if len(vOrder.Prints) > 0 {
-		u.generateSpkPrint(pdf, vOrder.Prints)
-	}
-	if len(vOrder.Finishings) > 0 {
-		u.generateSpkFinishing(pdf, vOrder.Finishings)
-	}
-	if len(vOrder.Others) > 0 {
-		u.generateSpkOther(pdf, vOrder.Others)
-	}
-
-	// Tanda Tangan
-	//pdf.Ln(20)
-	//pdf.Cell(190, 10, "Hormat Kami,")
-	//pdf.Ln(15)
-	//pdf.Cell(190, 10, "(______________________)")
-
-	return pdf
-}
-
-func (u usecase) GenerateInvoice(id string) (pdf *gofpdf.Fpdf, vOrder model.OrderView, err error) {
+func (u usecase) GenerateInvoice(id string) (pdfBytes []byte, vOrder model.OrderView, err error) {
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	preloads := []string{"Designs", "Finishings", "Prints", "Prints.Paper", "Others", "Customer", "Transactions"}
+	preloads := []string{"Company", "Designs", "Finishings", "Prints", "Prints.Paper", "Others", "Customer", "Transactions"}
 	vOrder, err = u.repository.GetViewById(conn, id, preloads...)
 	if err != nil {
-		return pdf, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
+		return pdfBytes, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
 	}
 
-	pdf = u.generateInvoice(vOrder)
+	pdfBytes, err = u.generateInvoice(vOrder)
 
-	return pdf, vOrder, err
+	return pdfBytes, vOrder, err
 }
 
-func (u usecase) generateInvoice(vOrder model.OrderView) (pdf *gofpdf.Fpdf) {
-
-	pdf = gofpdf.New("P", "mm", "A4", "") // 210 x 297
-	pdf.SetMargins(15, 10, 15)
-
-	totalPagesAlias := "{nb}"
-
-	pdf.SetHeaderFunc(func() {
-		// Add a header
-		pdf.SetFont("Arial", "B", 12)
-		pdf.Cell(0, 10, fmt.Sprintf("Custom Header - Page: %d", pdf.PageNo()))
-		pdf.Ln(10) // Line break
+func (u usecase) generateInvoice(vOrder model.OrderView) (pdfBytes []byte, err error) {
+	tmpl := template.New("invoice.html").Funcs(template.FuncMap{
+		"displayLembar": func(lembar int64) string {
+			return fmt.Sprintf("%s Lembar", utils.DisplayNumber(lembar))
+		},
+		"displayDuplex": func(isDuplex bool) string {
+			if isDuplex {
+				return "2 Muka"
+			}
+			return "1 Muka"
+		},
+		"displayDate":          utils.DisplayDate,
+		"displayDatetime":      utils.DisplayDatetime,
+		"displayNumber":        utils.DisplayNumber,
+		"displayMoney":         utils.DisplayMoney,
+		"displayPhoneNumber":   utils.DisplayPhoneNumber,
+		"displayInvoiceNumber": utils.DisplayInvoiceNumber,
 	})
 
-	pdf.SetFooterFunc(func() {
-		// Add a footer
-		pdf.SetY(-15) // Position at 1.5 cm from the bottom
-		pdf.SetFont("Arial", "I", 8)
-		pdf.Cell(0, 10, fmt.Sprintf("Footer - Page: %d of %s", pdf.PageNo(), totalPagesAlias))
-	})
-
-	pdf.AliasNbPages(totalPagesAlias) // Register the alias
-	pdf.AddPage()
-	pdf.SetFont("Arial", "", 12)
-	for i := 0; i < 200; i++ {
-		pdf.Cell(0, 10, "This is line "+string(i+1))
-		pdf.Ln(10) // Line break
+	// Parse template setelah fungsi didaftarkan
+	tmpl, err = tmpl.ParseFiles("assets/template/invoice.html")
+	if err != nil {
+		return pdfBytes, err
 	}
 
-	//// Header
-	//pdf.SetFont("Arial", "B", 16)
-	//pdf.Cell(0, 10, "Invoice")
-	//pdf.Ln(12)
-	//
-	//// Informasi Perusahaan
-	//pdf.SetFont("Arial", "", 12)
-	//pdf.Cell(0, 10, fmt.Sprintf("Dari : %s", vOrder.CompanyName))
-	////pdf.Ln(6)
-	////pdf.Cell(0, 10, "Alamat: Jalan Merdeka No.123, Jakarta")
-	////pdf.Ln(6)
-	////pdf.Cell(0, 10, "Email: contoh@perusahaan.com")
-	//pdf.Ln(10)
-	//
-	//// Informasi Pelanggan
-	//pdf.SetFont("Arial", "B", 12)
-	//pdf.Cell(0, 10, "Kepada:")
-	//pdf.Ln(6)
-	//pdf.SetFont("Arial", "", 12)
-	//pdf.Cell(0, 10, fmt.Sprintf("Name : %s", vOrder.Customer.Name))
-	////pdf.Ln(6)
-	////pdf.Cell(0, 10, "Alamat: Jalan Sudirman No.456, Bandung")
-	//pdf.Ln(10)
-	//
-	//// Daftar Item
-	//pdf.SetFont("Arial", "B", 12)
-	//pdf.Cell(90, 10, "Deskripsi")
-	//pdf.Cell(30, 10, "Jumlah")
-	//pdf.Cell(30, 10, "Harga Satuan")
-	//pdf.Cell(30, 10, "Total")
-	//pdf.Ln(10)
-	//
-	//items := []struct {
-	//	Description string
-	//	Quantity    int
-	//	UnitPrice   float64
-	//}{
-	//	{"Item 1", 2, 50000},
-	//	{"Item 2", 1, 75000},
-	//	{"Item 3", 3, 30000},
-	//}
-	//
-	//var grandTotal float64
-	//
-	//pdf.SetFont("Arial", "", 12)
-	//for _, item := range items {
-	//	total := float64(item.Quantity) * item.UnitPrice
-	//	grandTotal += total
-	//
-	//	pdf.Cell(90, 10, item.Description)
-	//	pdf.CellFormat(30, 10, fmt.Sprintf("%d", item.Quantity), "", 0, "C", false, 0, "")
-	//	pdf.CellFormat(30, 10, fmt.Sprintf("Rp%.2f", item.UnitPrice), "", 0, "R", false, 0, "")
-	//	pdf.CellFormat(30, 10, fmt.Sprintf("Rp%.2f", total), "", 0, "R", false, 0, "")
-	//	pdf.Ln(10)
-	//}
-	//
-	//// Total Keseluruhan
-	//pdf.SetFont("Arial", "B", 12)
-	//pdf.Cell(150, 10, "Grand Total")
-	//pdf.CellFormat(30, 10, fmt.Sprintf("Rp%.2f", grandTotal), "", 0, "R", false, 0, "")
+	// Render template ke buffer
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, vOrder); err != nil {
+		return pdfBytes, err
+	}
 
-	// Tanda Tangan
-	//pdf.Ln(20)
-	//pdf.Cell(190, 10, "Hormat Kami,")
-	//pdf.Ln(15)
-	//pdf.Cell(190, 10, "(______________________)")
+	// Simpan HTML render ke file sementara
+	tempHTMLFile := "temp.html"
+	if err := os.WriteFile(tempHTMLFile, buf.Bytes(), 0644); err != nil {
+		return pdfBytes, err
+	}
+	defer os.Remove(tempHTMLFile)
 
-	return pdf
+	return utils.GeneratePDFWithChromedp(tempHTMLFile)
 }
 
 func NewUsecase(repository Repository, repositoryDesign design.Repository, repositoryPrint print.Repository, repositoryFinishing finishing.Repository, repositoryOther other.Repository, repositoryOrderphase orderphase.Repository, repositoryCustomer customer.Repository, repositoryPhase phase.Repository, repositoryTransaction transaction.Repository) Usecase {

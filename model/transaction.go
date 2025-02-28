@@ -18,8 +18,12 @@ func (m *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
 		m.ID = utils.GetUniqueID()
 	}
 
-	m.CreateDt = now
-	m.UpdateDt = now
+	if m.CreateDt.IsZero() {
+		m.CreateDt = now
+	}
+	if m.UpdateDt.IsZero() {
+		m.UpdateDt = now
+	}
 	return
 }
 

@@ -13,7 +13,9 @@ func (m *Photo) BeforeCreate(tx *gorm.DB) (err error) {
 		m.ID = utils.GetUniqueID()
 	}
 
-	m.CreateDt = now
+	if m.CreateDt.IsZero() {
+		m.CreateDt = now
+	}
 	return
 }
 

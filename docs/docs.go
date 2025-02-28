@@ -1043,11 +1043,6 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "boolean",
-                        "name": "isDone",
-                        "in": "query"
-                    },
-                    {
                         "type": "integer",
                         "example": 10,
                         "name": "limit",
@@ -3566,9 +3561,6 @@ const docTemplate = `{
             "properties": {
                 "description": {
                     "type": "string"
-                },
-                "isDone": {
-                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

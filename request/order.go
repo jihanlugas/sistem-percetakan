@@ -10,7 +10,6 @@ type PageOrder struct {
 	PhaseID         string     `json:"phaseId" form:"phaseId" query:"phaseId"`
 	Name            string     `json:"name" form:"name" query:"name"`
 	Description     string     `json:"description" form:"description" query:"description"`
-	IsDone          *bool      `json:"isDone" form:"isDone" query:"isDone"`
 	StartDt         *time.Time `json:"startDt" form:"startDt" query:"startDt"`
 	EndDt           *time.Time `json:"endDt" form:"endDt" query:"endDt"`
 	StartTotalOrder *int64     `json:"startTotalOrder" form:"startTotalOrder" query:"startTotalOrder"`
@@ -42,7 +41,6 @@ type CreateOrderDesign struct {
 type UpdateOrder struct {
 	Name        string `json:"name" form:"name" query:"name" validate:"required"`
 	Description string `json:"description" form:"description" query:"description" validate:""`
-	IsDone      bool   `json:"isDone" form:"isDone" query:"isDone" validate:""`
 }
 
 type CreateOrderPrint struct {

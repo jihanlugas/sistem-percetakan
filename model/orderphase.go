@@ -20,6 +20,8 @@ func (m *Orderphase) BeforeCreate(tx *gorm.DB) (err error) {
 
 	if m.CreateDt.IsZero() {
 		m.CreateDt = now
+	}
+	if m.UpdateDt.IsZero() {
 		m.UpdateDt = now
 	}
 	return

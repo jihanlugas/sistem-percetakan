@@ -370,8 +370,6 @@ definitions:
     properties:
       description:
         type: string
-      isDone:
-        type: boolean
       name:
         type: string
     required:
@@ -1110,9 +1108,6 @@ paths:
       - in: query
         name: endTotalOrder
         type: integer
-      - in: query
-        name: isDone
-        type: boolean
       - example: 10
         in: query
         name: limit

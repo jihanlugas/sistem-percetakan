@@ -21,6 +21,9 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.3 // indirect
+	github.com/chromedp/cdproto v0.0.0-20250216233945-bd41ad9b04ce // indirect
+	github.com/chromedp/chromedp v0.12.1 // indirect
+	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
@@ -29,6 +32,9 @@ require (
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/gobwas/httphead v0.1.0 // indirect
+	github.com/gobwas/pool v0.2.1 // indirect
+	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
@@ -40,7 +46,7 @@ require (
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/phpdave11/gofpdi v1.0.14 // indirect
@@ -54,7 +60,7 @@ require (
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/net v0.32.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect

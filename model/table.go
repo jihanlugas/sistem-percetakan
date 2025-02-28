@@ -100,7 +100,7 @@ type Order struct {
 	CustomerID  string         `gorm:"not null" json:"customerId"`
 	Name        string         `gorm:"not null" json:"name"`
 	Description string         `gorm:"not null" json:"description"`
-	IsDone      bool           `gorm:"not null" json:"isDone"`
+	Number      int64          `gorm:"not null" json:"number"`
 	CreateBy    string         `gorm:"not null" json:"createBy"`
 	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
 	UpdateBy    string         `gorm:"not null" json:"updateBy"`
@@ -113,8 +113,8 @@ type Paper struct {
 	CompanyID          string         `gorm:"not null" json:"companyId"`
 	Name               string         `gorm:"not null" json:"name"`
 	Description        string         `gorm:"not null" json:"description"`
-	DefaultPrice       int            `gorm:"not null" json:"defaultPrice"`
-	DefaultPriceDuplex int            `gorm:"not null" json:"defaultPriceDuplex"`
+	DefaultPrice       int64          `gorm:"not null" json:"defaultPrice"`
+	DefaultPriceDuplex int64          `gorm:"not null" json:"defaultPriceDuplex"`
 	CreateBy           string         `gorm:"not null" json:"createBy"`
 	CreateDt           time.Time      `gorm:"not null" json:"createDt"`
 	UpdateBy           string         `gorm:"not null" json:"updateBy"`

@@ -434,9 +434,9 @@ func dbSeed() {
 
 	tx := conn.Begin()
 
-	userID := utils.GetUniqueID()
-	demoUserID := utils.GetUniqueID()
-	demoCompanyID := utils.GetUniqueID()
+	adminID := utils.GetUniqueID()
+	userID := "f7416f17-884b-46d3-b7db-b90be60a71c5"
+	companyID := "fcc18dfc-b0ef-42ef-8036-28503492a2a1"
 
 	now := time.Now()
 
@@ -447,7 +447,7 @@ func dbSeed() {
 
 	users := []model.User{
 		{
-			ID:                userID,
+			ID:                adminID,
 			Role:              constant.RoleAdmin,
 			Email:             "jihanlugas2@gmail.com",
 			Username:          "jihanlugas",
@@ -458,10 +458,10 @@ func dbSeed() {
 			PassVersion:       1,
 			IsActive:          true,
 			AccountVerifiedDt: &now,
-			CreateBy:          userID,
-			UpdateBy:          userID},
+			CreateBy:          adminID,
+			UpdateBy:          adminID},
 		{
-			ID:                demoUserID,
+			ID:                userID,
 			Role:              constant.RoleUseradmin,
 			Email:             "admindemo@gmail.com",
 			Username:          "admindemo",
@@ -472,75 +472,78 @@ func dbSeed() {
 			PassVersion:       1,
 			IsActive:          true,
 			AccountVerifiedDt: &now,
-			CreateBy:          userID,
-			UpdateBy:          userID,
+			CreateBy:          adminID,
+			UpdateBy:          adminID,
 		},
 	}
 	tx.Create(&users)
 
 	companies := []model.Company{
-		{ID: demoCompanyID,
+		{
+			ID:          companyID,
 			Name:        "Demo Company",
 			Description: "Demo Company Generated",
 			Email:       "companydemo@gmail",
 			PhoneNumber: utils.FormatPhoneTo62("6287770331234"),
 			Address:     "Jl. M.H. Thamrin No. 10, Jakarta Pusat",
-			CreateBy:    userID,
-			UpdateBy:    userID,
+			CreateBy:    adminID,
+			UpdateBy:    adminID,
 		},
 	}
 	tx.Create(&companies)
 
 	usercompanies := []model.Usercompany{
 		{
-			UserID:           demoUserID,
-			CompanyID:        demoCompanyID,
+			UserID:           userID,
+			CompanyID:        companyID,
 			IsDefaultCompany: true,
 			IsCreator:        true,
-			CreateBy:         userID,
-			UpdateBy:         userID,
+			CreateBy:         adminID,
+			UpdateBy:         adminID,
 		},
 	}
 	tx.Create(&usercompanies)
 
 	phases := []model.Phase{
-		{ID: utils.GetUniqueID(), Order: 1, Name: "Open", Description: "Order Masuk", CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Order: 2, Name: "Design", Description: "Order sedang di desain", CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Order: 3, Name: "Print", Description: "Order sedang di print", CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Order: 4, Name: "Finishing", Description: "Order sedang di finishing", CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Order: 5, Name: "Done", Description: "Order selesai proses", CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Order: 6, Name: "Close", Description: "Order sudah di berikan customer", CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Order: 1, Name: "Open", Description: "Order Masuk", CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Order: 2, Name: "Design", Description: "Order sedang di desain", CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Order: 3, Name: "Print", Description: "Order sedang di print", CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Order: 4, Name: "Finishing", Description: "Order sedang di finishing", CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Order: 5, Name: "Done", Description: "Order selesai proses", CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Order: 6, Name: "Close", Description: "Order sudah di berikan customer", CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
 	}
 	tx.Create(&phases)
 
 	papers := []model.Paper{
-		{ID: utils.GetUniqueID(), Name: "A3 HVS 80", Description: "", DefaultPrice: 1800, DefaultPriceDuplex: 2600, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Name: "A3 HVS 100", Description: "", DefaultPrice: 1900, DefaultPriceDuplex: 2700, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Name: "A3 Art Paper 120", Description: "", DefaultPrice: 2000, DefaultPriceDuplex: 2800, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Name: "A3 Art Paper 150", Description: "", DefaultPrice: 2100, DefaultPriceDuplex: 2900, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Name: "A3 Art Carton 210", Description: "", DefaultPrice: 2200, DefaultPriceDuplex: 3000, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Name: "A3 Art Carton 230", Description: "", DefaultPrice: 2300, DefaultPriceDuplex: 3100, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), Name: "A3 Art Carton 260", Description: "", DefaultPrice: 2400, DefaultPriceDuplex: 3200, CompanyID: demoCompanyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 HVS 80", Description: "", DefaultPrice: 1800, DefaultPriceDuplex: 2600, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 HVS 100", Description: "", DefaultPrice: 1900, DefaultPriceDuplex: 2700, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 Art Paper 120", Description: "", DefaultPrice: 2000, DefaultPriceDuplex: 2800, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 Art Paper 150", Description: "", DefaultPrice: 2100, DefaultPriceDuplex: 2900, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 Art Carton 210", Description: "", DefaultPrice: 2200, DefaultPriceDuplex: 3000, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 Art Carton 230", Description: "", DefaultPrice: 2300, DefaultPriceDuplex: 3100, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 Art Carton 260", Description: "", DefaultPrice: 2400, DefaultPriceDuplex: 3200, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "A3 Stiker", Description: "", DefaultPrice: 5000, DefaultPriceDuplex: 7000, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), Name: "Blangko", Description: "", DefaultPrice: 5000, DefaultPriceDuplex: 7000, CompanyID: companyID, CreateBy: userID, UpdateBy: userID},
 	}
 	tx.Create(&papers)
 
 	customers := []model.Customer{
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Ikuta Rira", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Udin", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Budi", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Roronoa Zoro", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Kamado Tanjiro", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Kim Jong Un", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Uru", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Al Ghazali", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Aliando", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Alguero", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Cahyono", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Cristiano Ronaldo", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Leonel Messi", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Gojo Satoru", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Park Chan-wook", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
-		{ID: utils.GetUniqueID(), CompanyID: demoCompanyID, Name: "Lee Myung-bak", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Ikuta Rira", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Udin", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Budi", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Roronoa Zoro", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Kamado Tanjiro", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Kim Jong Un", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Uru", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Al Ghazali", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Aliando", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Alguero", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Cahyono", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Cristiano Ronaldo", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Leonel Messi", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Gojo Satoru", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Park Chan-wook", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
+		{ID: utils.GetUniqueID(), CompanyID: companyID, Name: "Lee Myung-bak", Email: "", Description: "Generated Data", Address: "Jl. Kehidupan", PhoneNumber: "6281231231234", CreateBy: userID, UpdateBy: userID},
 	}
 	mapCustomers := []model.Customer{}
 	for i, customer := range customers {
@@ -551,54 +554,65 @@ func dbSeed() {
 	}
 	tx.Create(&mapCustomers)
 
-	orders := []model.Order{
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			CustomerID:  customers[0].ID,
-			Name:        "Majalah Manchester City",
-			Description: "- Majalah Liga Inggris\n- Majalah Liga Champions",
-			IsDone:      false,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			CustomerID:  customers[1].ID,
-			Name:        "Batik",
-			Description: "1. 200 lembar\n2. 300 lembar\n3. 50 lembar",
-			IsDone:      true,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
+	tx = dbSeedOrderMajalah(tx, companyID, userID, mapCustomers[0], papers, phases, now.AddDate(0, 0, -3))
+	tx = dbSeedOrderBatik(tx, companyID, userID, mapCustomers[1], papers, phases, now.AddDate(0, 0, -5))
+	tx = dbSeedOrderKartuNama(tx, companyID, userID, mapCustomers[2], papers, phases, now.AddDate(0, 0, -6))
+	tx = dbSeedOrderBanner(tx, companyID, userID, mapCustomers[3], papers, phases, now.AddDate(0, 0, -7))
+	tx = dbSeedOrderNameTag(tx, companyID, userID, mapCustomers[1], papers, phases, now.AddDate(0, 0, -7))
+	tx = dbSeedOrderStiker(tx, companyID, userID, mapCustomers[1], papers, phases, now.AddDate(0, 0, -8))
+	tx = dbSeedOrderUndangan(tx, companyID, userID, mapCustomers[2], papers, phases, now.AddDate(0, 0, -8))
+
+	err = tx.Commit().Error
+	if err != nil {
+		panic(err)
 	}
-	tx.Create(&orders)
+
+	fmt.Println("Seeding the database with initial data end")
+}
+
+func dbSeedOrderMajalah(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	order := model.Order{
+		ID:          utils.GetUniqueID(),
+		CompanyID:   companyID,
+		CustomerID:  customer.ID,
+		Name:        "Majalah Manchester City",
+		Description: "- Majalah Liga Inggris\n- Majalah Liga Champions",
+		Number:      1,
+		CreateBy:    userID,
+		CreateDt:    now,
+		UpdateBy:    userID,
+		UpdateDt:    now,
+	}
+	tx.Create(&order)
 
 	designs := []model.Design{
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Cover Liga Inggris",
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Design Cover Liga Inggris",
 			Description: "Photo photo liga inggris",
 			Qty:         1,
 			Price:       20000,
 			Total:       1 * 20000,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Cover iga champions",
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Design Cover iga champions",
 			Description: "Photo liga champions",
 			Qty:         1,
 			Price:       30000,
 			Total:       1 * 30000,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 	}
 	tx.Create(&designs)
@@ -606,8 +620,8 @@ func dbSeed() {
 	prints := []model.Print{
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[5].ID,
 			Name:        "Cover Liga Inggris",
 			Description: "Cover 400 lembar",
@@ -617,12 +631,14 @@ func dbSeed() {
 			Price:       2300,
 			Total:       1 * 400 * 2300,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[6].ID,
 			Name:        "Cover Liga Champions",
 			Description: "Cover 300 lembar",
@@ -632,12 +648,14 @@ func dbSeed() {
 			Price:       2400,
 			Total:       1 * 300 * 2400,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[2].ID,
 			Name:        "Isi Liga Inggris",
 			Description: "Isi timbal balik 120 lembar",
@@ -647,12 +665,14 @@ func dbSeed() {
 			Price:       2800,
 			Total:       120 * 400 * 2800,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[3].ID,
 			Name:        "Isi Liga Champions",
 			Description: "Isi timbal balik 140 lembar",
@@ -662,12 +682,146 @@ func dbSeed() {
 			Price:       2900,
 			Total:       140 * 300 * 2900,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&prints)
+
+	finishings := []model.Finishing{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Potong",
+			Description: "Borongan potong 200K",
+			Qty:         1,
+			Price:       200000,
+			Total:       1 * 200000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[1].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Laminating Cover",
+			Description: "Laminating Cover 300 dan 400",
+			Qty:         700,
+			Price:       2400,
+			Total:       700 * 2400,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Banding",
+			Description: "Banding 300 dan 400 Buku",
+			Qty:         700,
+			Price:       17000,
+			Total:       700 * 17000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&finishings)
+
+	others := []model.Other{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Banner liga inggris",
+			Description: "Borongan ke belakang",
+			Qty:         400,
+			Price:       18000,
+			Total:       400 * 18000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Banner liga champion",
+			Description: "Borongan ke belakang",
+			Qty:         300,
+			Price:       20000,
+			Total:       300 * 20000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&others)
+
+	transactions := []model.Transaction{}
+	tx.Create(&transactions)
+
+	orderphases := []model.Orderphase{
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[0].ID,
+			Name:      phases[0].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 1),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 1),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[1].ID,
+			Name:      phases[1].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 2),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 2),
+		},
+	}
+	tx.Create(&orderphases)
+
+	return tx
+}
+
+func dbSeedOrderBatik(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	order := model.Order{
+		ID:          utils.GetUniqueID(),
+		CompanyID:   companyID,
+		CustomerID:  customer.ID,
+		Name:        "Batik",
+		Description: "1. 200 lembar\n2. 300 lembar\n3. 50 lembar",
+		Number:      2,
+		CreateBy:    userID,
+		CreateDt:    now,
+		UpdateBy:    userID,
+		UpdateDt:    now,
+	}
+	tx.Create(&order)
+
+	designs := []model.Design{}
+	tx.Create(&designs)
+
+	prints := []model.Print{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[6].ID,
 			Name:        "Model 1",
 			Description: "300 Lembar",
@@ -677,12 +831,14 @@ func dbSeed() {
 			Price:       2400,
 			Total:       1 * 300 * 2400,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[1].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[6].ID,
 			Name:        "Model 2",
 			Description: "400 Lembar",
@@ -692,12 +848,14 @@ func dbSeed() {
 			Price:       2400,
 			Total:       1 * 400 * 2400,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[1].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			PaperID:     papers[6].ID,
 			Name:        "Model 3",
 			Description: "50 Lembar",
@@ -707,99 +865,43 @@ func dbSeed() {
 			Price:       2400,
 			Total:       1 * 50 * 2400,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 	}
 	tx.Create(&prints)
 
-	finishings := []model.Finishing{
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Potong",
-			Description: "Borongan potong 200K",
-			Qty:         1,
-			Price:       200000,
-			Total:       1 * 200000,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Laminating Cover",
-			Description: "Laminating Cover 300 dan 400",
-			Qty:         700,
-			Price:       2400,
-			Total:       700 * 2400,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Banding",
-			Description: "Banding 300 dan 400 Buku",
-			Qty:         700,
-			Price:       17000,
-			Total:       700 * 17000,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
-	}
+	finishings := []model.Finishing{}
 	tx.Create(&finishings)
 
-	others := []model.Other{
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Sampul liga inggris",
-			Description: "Borongan ke belakang",
-			Qty:         400,
-			Price:       18000,
-			Total:       400 * 18000,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
-		{
-			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[0].ID,
-			Name:        "Sampul liga champion",
-			Description: "Borongan ke belakang",
-			Qty:         300,
-			Price:       20000,
-			Total:       300 * 20000,
-			CreateBy:    userID,
-			UpdateBy:    userID,
-		},
-	}
+	others := []model.Other{}
 	tx.Create(&others)
 
 	transactions := []model.Transaction{
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[1].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			Name:        "DP",
 			Description: "DP 10 jt",
 			Amount:      1000000,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 		{
 			ID:          utils.GetUniqueID(),
-			CompanyID:   demoCompanyID,
-			OrderID:     orders[1].ID,
+			CompanyID:   companyID,
+			OrderID:     order.ID,
 			Name:        "Lunas",
 			Description: "Lunas",
 			Amount:      800000,
 			CreateBy:    userID,
+			CreateDt:    now,
 			UpdateBy:    userID,
+			UpdateDt:    now,
 		},
 	}
 	tx.Create(&transactions)
@@ -807,68 +909,577 @@ func dbSeed() {
 	orderphases := []model.Orderphase{
 		{
 			ID:        utils.GetUniqueID(),
-			CompanyID: demoCompanyID,
-			OrderID:   orders[0].ID,
+			CompanyID: companyID,
+			OrderID:   order.ID,
 			PhaseID:   phases[0].ID,
 			Name:      phases[0].Name,
 			CreateBy:  userID,
-			CreateDt:  now.AddDate(0, 0, -3),
+			CreateDt:  now.AddDate(0, 0, 1),
 			UpdateBy:  userID,
-			UpdateDt:  now.AddDate(0, 0, -3),
+			UpdateDt:  now.AddDate(0, 0, 1),
 		},
 		{
 			ID:        utils.GetUniqueID(),
-			CompanyID: demoCompanyID,
-			OrderID:   orders[0].ID,
+			CompanyID: companyID,
+			OrderID:   order.ID,
 			PhaseID:   phases[1].ID,
 			Name:      phases[1].Name,
 			CreateBy:  userID,
-			CreateDt:  now.AddDate(0, 0, -2),
+			CreateDt:  now.AddDate(0, 0, 2),
 			UpdateBy:  userID,
-			UpdateDt:  now.AddDate(0, 0, -2),
+			UpdateDt:  now.AddDate(0, 0, 2),
 		},
 		{
 			ID:        utils.GetUniqueID(),
-			CompanyID: demoCompanyID,
-			OrderID:   orders[1].ID,
-			PhaseID:   phases[0].ID,
-			Name:      phases[0].Name,
-			CreateBy:  userID,
-			CreateDt:  now.AddDate(0, 0, -3),
-			UpdateBy:  userID,
-			UpdateDt:  now.AddDate(0, 0, -3),
-		},
-		{
-			ID:        utils.GetUniqueID(),
-			CompanyID: demoCompanyID,
-			OrderID:   orders[1].ID,
-			PhaseID:   phases[1].ID,
-			Name:      phases[1].Name,
-			CreateBy:  userID,
-			CreateDt:  now.AddDate(0, 0, -2),
-			UpdateBy:  userID,
-			UpdateDt:  now.AddDate(0, 0, -2),
-		},
-		{
-			ID:        utils.GetUniqueID(),
-			CompanyID: demoCompanyID,
-			OrderID:   orders[1].ID,
+			CompanyID: companyID,
+			OrderID:   order.ID,
 			PhaseID:   phases[2].ID,
 			Name:      phases[2].Name,
 			CreateBy:  userID,
-			CreateDt:  now.AddDate(0, 0, -1),
+			CreateDt:  now.AddDate(0, 0, 3),
 			UpdateBy:  userID,
-			UpdateDt:  now.AddDate(0, 0, -1),
+			UpdateDt:  now.AddDate(0, 0, 3),
 		},
 	}
 	tx.Create(&orderphases)
 
-	err = tx.Commit().Error
-	if err != nil {
-		panic(err)
-	}
+	return tx
+}
 
-	fmt.Println("Seeding the database with initial data end")
+func dbSeedOrderKartuNama(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	order := model.Order{
+		ID:          utils.GetUniqueID(),
+		CompanyID:   companyID,
+		CustomerID:  customer.ID,
+		Name:        "Kartu Nama",
+		Description: "4 box",
+		Number:      3,
+		CreateBy:    userID,
+		CreateDt:    now,
+		UpdateBy:    userID,
+		UpdateDt:    now,
+	}
+	tx.Create(&order)
+
+	designs := []model.Design{}
+	tx.Create(&designs)
+
+	prints := []model.Print{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			PaperID:     papers[6].ID,
+			Name:        "Kartu Nama",
+			Description: "20 Lembar",
+			IsDuplex:    false,
+			PageCount:   1,
+			Qty:         20,
+			Price:       papers[6].DefaultPrice,
+			Total:       1 * 20 * papers[6].DefaultPrice,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&prints)
+
+	finishings := []model.Finishing{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     userID,
+			Name:        "Potong",
+			Description: "",
+			Qty:         1,
+			Price:       20000,
+			Total:       1 * 20000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&finishings)
+
+	others := []model.Other{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     userID,
+			Name:        "Box  Kartu Nama",
+			Description: "4 Box",
+			Qty:         4,
+			Price:       5000,
+			Total:       4 * 5000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&others)
+
+	transactions := []model.Transaction{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "DP",
+			Description: "",
+			Amount:      papers[6].DefaultPrice * 10,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 1),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 1),
+		},
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Lunas",
+			Description: "",
+			Amount:      papers[6].DefaultPrice * 10,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 2),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 2),
+		},
+	}
+	tx.Create(&transactions)
+
+	orderphases := []model.Orderphase{
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[0].ID,
+			Name:      phases[0].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 1),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 1),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[1].ID,
+			Name:      phases[1].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 2),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 2),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[2].ID,
+			Name:      phases[2].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 3),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 3),
+		},
+	}
+	tx.Create(&orderphases)
+
+	return tx
+}
+
+func dbSeedOrderBanner(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	order := model.Order{
+		ID:          utils.GetUniqueID(),
+		CompanyID:   companyID,
+		CustomerID:  customer.ID,
+		Name:        "Banner Ridwan Kamil",
+		Description: "4 buah \n 4 x 12 ",
+		Number:      4,
+		CreateBy:    userID,
+		CreateDt:    now,
+		UpdateBy:    userID,
+		UpdateDt:    now,
+	}
+	tx.Create(&order)
+
+	designs := []model.Design{}
+	tx.Create(&designs)
+
+	prints := []model.Print{}
+	tx.Create(&prints)
+
+	finishings := []model.Finishing{}
+	tx.Create(&finishings)
+
+	others := []model.Other{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Banner Ridwan Kamil",
+			Description: "4 Box",
+			Qty:         4,
+			Price:       30000 * 4 * 12,
+			Total:       4 * 30000 * 4 * 12,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&others)
+
+	transactions := []model.Transaction{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Lunas",
+			Description: "",
+			Amount:      4 * 30000 * 4 * 12,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 2),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 2),
+		},
+	}
+	tx.Create(&transactions)
+
+	orderphases := []model.Orderphase{
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[0].ID,
+			Name:      phases[0].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 1),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 1),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[4].ID,
+			Name:      phases[4].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 2),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 2),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[5].ID,
+			Name:      phases[5].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 3),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 3),
+		},
+	}
+	tx.Create(&orderphases)
+
+	return tx
+}
+
+func dbSeedOrderNameTag(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	order := model.Order{
+		ID:          utils.GetUniqueID(),
+		CompanyID:   companyID,
+		CustomerID:  customer.ID,
+		Name:        "Name Tag Peradi",
+		Description: "10 buah",
+		Number:      5,
+		CreateBy:    userID,
+		CreateDt:    now,
+		UpdateBy:    userID,
+		UpdateDt:    now,
+	}
+	tx.Create(&order)
+
+	designs := []model.Design{
+		{
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Design Foto",
+			Description: "",
+			Qty:         10,
+			Price:       10000,
+			Total:       10 * 10000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&designs)
+
+	prints := []model.Print{}
+	tx.Create(&prints)
+
+	finishings := []model.Finishing{}
+	tx.Create(&finishings)
+
+	others := []model.Other{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Name Tag Peradi",
+			Description: "10 Buah",
+			Qty:         10,
+			Price:       20000,
+			Total:       10 * 20000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&others)
+
+	transactions := []model.Transaction{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "DP",
+			Description: "",
+			Amount:      10 * 10000,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 2),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 2),
+		},
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Lunas",
+			Description: "",
+			Amount:      10 * 20000,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 2),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 2),
+		},
+	}
+	tx.Create(&transactions)
+
+	orderphases := []model.Orderphase{
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[0].ID,
+			Name:      phases[0].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 1),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 1),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[4].ID,
+			Name:      phases[4].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 2),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 2),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[5].ID,
+			Name:      phases[5].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 3),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 3),
+		},
+	}
+	tx.Create(&orderphases)
+
+	return tx
+}
+
+func dbSeedOrderStiker(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	order := model.Order{
+		ID:          utils.GetUniqueID(),
+		CompanyID:   companyID,
+		CustomerID:  customer.ID,
+		Name:        "Stiker Selamat Makan",
+		Description: "2 Model \n Jadi masing masing 300",
+		Number:      5,
+		CreateBy:    userID,
+		CreateDt:    now,
+		UpdateBy:    userID,
+		UpdateDt:    now,
+	}
+	tx.Create(&order)
+
+	designs := []model.Design{}
+	tx.Create(&designs)
+
+	prints := []model.Print{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			PaperID:     papers[7].ID,
+			Name:        "Model 1",
+			Description: "Stiker Selamat Makan Model 1",
+			IsDuplex:    false,
+			PageCount:   1,
+			Qty:         30,
+			Price:       papers[7].DefaultPrice,
+			Total:       1 * 30 * papers[7].DefaultPrice,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			PaperID:     papers[7].ID,
+			Name:        "Model 1",
+			Description: "Stiker Selamat Makan Model 2",
+			IsDuplex:    false,
+			PageCount:   1,
+			Qty:         30,
+			Price:       papers[7].DefaultPrice,
+			Total:       1 * 30 * papers[7].DefaultPrice,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&prints)
+
+	finishings := []model.Finishing{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Cutting",
+			Description: "Borongan 200K",
+			Qty:         1,
+			Price:       200000,
+			Total:       1 * 200000,
+			CreateBy:    userID,
+			CreateDt:    now,
+			UpdateBy:    userID,
+			UpdateDt:    now,
+		},
+	}
+	tx.Create(&finishings)
+
+	others := []model.Other{}
+	tx.Create(&others)
+
+	transactions := []model.Transaction{
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "DP",
+			Description: "",
+			Amount:      papers[7].DefaultPrice * 30,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 1),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 1),
+		},
+		{
+			ID:          utils.GetUniqueID(),
+			CompanyID:   companyID,
+			OrderID:     order.ID,
+			Name:        "Lunas",
+			Description: "",
+			Amount:      papers[7].DefaultPrice*30 + 200000,
+			CreateBy:    userID,
+			CreateDt:    now.AddDate(0, 0, 2),
+			UpdateBy:    userID,
+			UpdateDt:    now.AddDate(0, 0, 2),
+		},
+	}
+	tx.Create(&transactions)
+
+	orderphases := []model.Orderphase{
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[0].ID,
+			Name:      phases[0].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 1),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 1),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[2].ID,
+			Name:      phases[2].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 2),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 2),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[3].ID,
+			Name:      phases[3].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 3),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 3),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[4].ID,
+			Name:      phases[4].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 4),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 4),
+		},
+		{
+			ID:        utils.GetUniqueID(),
+			CompanyID: companyID,
+			OrderID:   order.ID,
+			PhaseID:   phases[5].ID,
+			Name:      phases[5].Name,
+			CreateBy:  userID,
+			CreateDt:  now.AddDate(0, 0, 5),
+			UpdateBy:  userID,
+			UpdateDt:  now.AddDate(0, 0, 5),
+		},
+	}
+	tx.Create(&orderphases)
+
+	return tx
+}
+
+func dbSeedOrderUndangan(tx *gorm.DB, companyID, userID string, customer model.Customer, papers []model.Paper, phases []model.Phase, now time.Time) *gorm.DB {
+	return tx
 }
 
 func dbReset() {

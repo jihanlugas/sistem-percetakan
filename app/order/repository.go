@@ -12,6 +12,7 @@ import (
 type Repository interface {
 	GetTableById(conn *gorm.DB, id string, preloads ...string) (tOrder model.Order, err error)
 	GetViewById(conn *gorm.DB, id string, preloads ...string) (vOrder model.OrderView, err error)
+	GetNextNumber(conn *gorm.DB, companyID string) (number int64)
 	Create(conn *gorm.DB, tOrder model.Order) error
 	Creates(conn *gorm.DB, tOrders []model.Order) error
 	Update(conn *gorm.DB, tOrder model.Order) error
@@ -41,6 +42,11 @@ func (r repository) GetViewById(conn *gorm.DB, id string, preloads ...string) (v
 	}
 	err = conn.Where("id = ? ", id).First(&vOrder).Error
 	return vOrder, err
+}
+
+func (r repository) GetNextNumber(conn *gorm.DB, companyID string) (number int64) {
+	conn.Model(&model.Order{}).Where("company_id = ?", companyID).Count(&number)
+	return number + 1
 }
 
 func (r repository) Create(conn *gorm.DB, tOrder model.Order) error {
@@ -87,9 +93,6 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 	}
 	if req.Description != "" {
 		query = query.Where("description ILIKE ?", "%"+req.Description+"%")
-	}
-	if req.IsDone != nil {
-		query = query.Where("is_done = ?", req.IsDone)
 	}
 	if req.StartDt != nil {
 		query = query.Where("create_dt >= ?", req.StartDt)

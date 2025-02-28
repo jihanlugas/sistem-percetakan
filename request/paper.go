@@ -14,13 +14,13 @@ type CreatePaper struct {
 	CompanyID          string `json:"companyId" form:"companyId" query:"companyId"`
 	Name               string `json:"name" form:"name" query:"name" validate:"required"`
 	Description        string `json:"description" form:"description" query:"description" validate:""`
-	DefaultPrice       int    `json:"defaultPrice" form:"defaultPrice" query:"defaultPrice"`
-	DefaultPriceDuplex int    `json:"defaultPriceDuplex" form:"defaultPriceDuplex" query:"defaultPriceDuplex"`
+	DefaultPrice       int64  `json:"defaultPrice" form:"defaultPrice" query:"defaultPrice"`
+	DefaultPriceDuplex int64  `json:"defaultPriceDuplex" form:"defaultPriceDuplex" query:"defaultPriceDuplex"`
 }
 
 type UpdatePaper struct {
 	Name               string `json:"name" form:"name" query:"name" validate:"required"`
 	Description        string `json:"description" form:"description" query:"description" validate:""`
-	DefaultPrice       int    `json:"defaultPrice" form:"defaultPrice" query:"defaultPrice"`
-	DefaultPriceDuplex int    `json:"defaultPriceDuplex" form:"defaultPriceDuplex" query:"defaultPriceDuplex"`
+	DefaultPrice       int64  `json:"defaultPrice" form:"defaultPrice" query:"defaultPrice"`
+	DefaultPriceDuplex int64  `json:"defaultPriceDuplex" form:"defaultPriceDuplex" query:"defaultPriceDuplex"`
 }

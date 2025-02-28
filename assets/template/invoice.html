@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <title>Invoice - {{.CompanyName}}</title>
+  <style>
+    html {
+      font-size: 12px;
+    }
+    body,
+    pre {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .page {
+      /* page-break-after: always; Ensure each div is treated as a new page */
+      width: 150mm;
+      height: 148mm;
+      margin: 0 auto;
+      box-sizing: border-box;
+      /*border: 1px solid #ccc;*/
+    }
+  </style>
+</head>
+<body>
+<div class="page p-8">
+  <div class="grid grid-cols-2 gap-2 mb-2">
+    <div>
+      <div class="font-bold">{{.Company.Name}}</div>
+      <div class="">{{.Company.Address}}</div>
+      <div class="">{{displayPhoneNumber .Company.PhoneNumber}}</div>
+    </div>
+    <div class="flex items-center justify-end">
+      <div>Logo</div>
+    </div>
+  </div>
+  <hr class="border-2 mb-4 border-gray-300" />
+  <div class="mb-2">
+    <div class="">
+      <div class="text-xl font-bold">Invoice</div>
+      <div class="">{{ displayInvoiceNumber .Number .CreateDt }}</div>
+    </div>
+  </div>
+  <div class="mb-2 grid grid-cols-2 gap-4">
+    <div>
+      <table class="">
+        <tr>
+          <td class="w-20">Order</td>
+          <td class="w-4">:</td>
+          <td>{{.Name}}</td>
+        </tr>
+        <tr>
+          <td class="w-20">Pelanggan</td>
+          <td class="w-4">:</td>
+          {{ if .Customer }}
+          <td>{{ .Customer.Name}}</td>
+          {{ else }}
+          <td>-</td>
+          {{ end }}
+        </tr>
+        <tr>
+          <td class="w-20">No HP</td>
+          <td class="w-4">:</td>
+          {{ if .Customer }}
+          <td>{{displayPhoneNumber .Customer.PhoneNumber}}</td>
+          {{ else }}
+          <td>-</td>
+          {{ end }}
+        </tr>
+      </table>
+    </div>
+    <div>
+      <table class="">
+        <tr>
+          <td class="w-20">Tanggal</td>
+          <td class="w-4">:</td>
+          <td>{{ displayDatetime .CreateDt}}</td>
+        </tr>
+        <tr>
+          <td class="w-20">CS</td>
+          <td class="w-4">:</td>
+          <td>{{.CreateName}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="mb-4">
+    <table class="w-full table-auto border-y-2 border-gray-300">
+      <thead>
+      <tr class="text-left border-b-1 border-gray-300">
+        <th class="py-2 px-1">Nama</th>
+        <th class="py-2 px-1 text-right">Jumlah Lembar</th>
+        <th class="py-2 px-1 text-right">Qty</th>
+        <th class="py-2 px-1 text-right">Harga</th>
+        <th class="py-2 px-1 text-right">Total</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{range $design := .Designs}}
+      <tr class="border-gray-300">
+        <td class="py-1 px-1">{{$design.Name}}</td>
+        <td class="py-2 px-1 text-right">-</td>
+        <td class="py-1 px-1 text-right">{{ displayNumber $design.Qty}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $design.Price}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $design.Total}}</td>
+      </tr>
+      {{end}}
+      {{range $print := .Prints}}
+      <tr class="border-gray-300">
+        <td class="py-1 px-1">
+          <div>{{$print.Name}}</div>
+          <div class="text-sm">{{$print.PaperName}} | {{ displayDuplex $print.IsDuplex }}</div>
+        </td>
+        <td class="py-1 px-1 text-right">{{ displayNumber $print.PageCount }}</td>
+        <td class="py-1 px-1 text-right">{{ displayNumber $print.Qty}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $print.Price}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $print.Total}}</td>
+      </tr>
+      {{end}}
+      {{range $finishing := .Finishings}}
+      <tr class="border-gray-300">
+        <td class="py-1 px-1">{{$finishing.Name}}</td>
+        <td class="py-2 px-1 text-right">-</td>
+        <td class="py-1 px-1 text-right">{{ displayNumber $finishing.Qty}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $finishing.Price}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $finishing.Total}}</td>
+      </tr>
+      {{end}}
+      {{range $other := .Others}}
+      <tr class="border-gray-300">
+        <td class="py-1 px-1">{{$other.Name}}</td>
+        <td class="py-2 px-1 text-right">-</td>
+        <td class="py-1 px-1 text-right">{{ displayNumber $other.Qty}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $other.Price}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $other.Total}}</td>
+      </tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <div class="grid grid-cols-2 gap-4">
+      <div></div>
+      <div>
+        <div class="flex justify-between px-1">
+          <div>Total Order</div>
+          <div>{{ displayMoney .TotalOrder}}</div>
+        </div>
+        <hr class="border-1 border-gray-300 my-1" />
+        {{if gt (len .Transactions) 0}}
+          {{range $transaction := .Transactions}}
+          <div class="flex justify-between px-1">
+            <div>{{ $transaction.Name }}</div>
+            <div>{{ displayMoney $transaction.Amount}}</div>
+          </div>
+          {{end}}
+        {{end}}
+        <div class="flex justify-between px-1">
+          <div>Total Pembayaran</div>
+          <div>{{ displayMoney .TotalTransaction}}</div>
+        </div>
+        <hr class="border-1 border-gray-300 my-1" />
+        <div class="flex justify-between px-1">
+          <div>Sisa Pembayaran</div>
+          <div>{{ displayMoney .Outstanding}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

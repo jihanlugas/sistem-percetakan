@@ -120,23 +120,18 @@ func (h Handler) GenerateSpk(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
 	}
 
-	pdf, vOrder, err := h.usecase.GenerateSpk(id)
+	pdfBytes, vOrder, err := h.usecase.GenerateSpk(id)
 	if err != nil {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}
 
-	// Menyimpan PDF ke buffer
-	var buf bytes.Buffer
-	err = pdf.Output(&buf)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, "Failed to generate PDF")
-	}
+	fmt.Print(fmt.Sprintf("%s SPK %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name))
 
-	//Set the Content-Disposition header to suggest a filename
 	filename := fmt.Sprintf("%s SPK %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
 	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
 
-	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(buf.Bytes()))
+	// Kirimkan PDF sebagai respons
+	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(pdfBytes))
 }
 
 // GenerateInvoice
@@ -157,23 +152,18 @@ func (h Handler) GenerateInvoice(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
 	}
 
-	pdf, _, err := h.usecase.GenerateInvoice(id)
+	pdfBytes, vOrder, err := h.usecase.GenerateInvoice(id)
 	if err != nil {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}
 
-	// Menyimpan PDF ke buffer
-	var buf bytes.Buffer
-	err = pdf.Output(&buf)
-	if err != nil {
-		return c.String(http.StatusInternalServerError, fmt.Sprintf("Failed to generate PDF: %v", err))
-	}
+	fmt.Print(fmt.Sprintf("%s Invoice %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name))
 
-	//Set the Content-Disposition header to suggest a filename
-	//filename := fmt.Sprintf("%s Invoice %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
-	//c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
+	filename := fmt.Sprintf("%s Invoice %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
 
-	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(buf.Bytes()))
+	// Kirimkan PDF sebagai respons
+	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(pdfBytes))
 }
 
 // Create

@@ -24,9 +24,8 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/response"
 	"github.com/labstack/echo/v4"
-	"net/http"
-
 	echoSwagger "github.com/swaggo/echo-swagger"
+	"net/http"
 )
 
 func Init() *echo.Echo {
@@ -84,7 +83,6 @@ func Init() *echo.Echo {
 	routerAuth.POST("/sign-out", authHandler.SignOut)
 	routerAuth.GET("/init", authHandler.Init, checkTokenMiddleware)
 	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
-	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
 
 	routerUser := router.Group("/user", checkTokenMiddleware)
 	routerUser.GET("", userHandler.Page)
@@ -98,15 +96,15 @@ func Init() *echo.Echo {
 	routerOrder.GET("", orderHandler.Page)
 	routerOrder.POST("", orderHandler.Create)
 	routerOrder.GET("/:id", orderHandler.GetById)
-	//routerOrder.GET("/:id/spk", orderHandler.GenerateSpk)
-	//routerOrder.GET("/:id/invoice", orderHandler.GenerateInvoice)
+	routerOrder.GET("/:id/spk", orderHandler.GenerateSpk)
+	routerOrder.GET("/:id/invoice", orderHandler.GenerateInvoice)
 	routerOrder.PUT("/:id", orderHandler.Update)
 	routerOrder.POST("/:id/add-phase", orderHandler.AddPhase)
 	routerOrder.POST("/:id/add-transaction", orderHandler.AddTransaction)
 	routerOrder.DELETE("/:id", orderHandler.Delete)
 
-	router.GET("/order/:id/spk", orderHandler.GenerateSpk)
-	router.GET("/order/:id/invoice", orderHandler.GenerateInvoice)
+	//router.GET("/order/:id/spk", orderHandler.GenerateSpk)
+	//router.GET("/order/:id/invoice", orderHandler.GenerateInvoice)
 
 	routerCustomer := router.Group("/customer", checkTokenMiddleware)
 	routerCustomer.GET("", customerHandler.Page)

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/constant"
 	"reflect"
 	"regexp"
@@ -105,4 +106,68 @@ func DisplayBool(data bool, trueText string, falseText string) string {
 		return trueText
 	}
 	return falseText
+}
+
+func DisplayPhoneNumber(value string) string {
+	// Remove all non-digit characters
+	cleaned := regexp.MustCompile(`\D`).ReplaceAllString(value, "")
+
+	// Match phone number format with optional '62' prefix
+	re := regexp.MustCompile(`^(62|)?(\d{3})(\d{4})(\d{3,6})$`)
+	match := re.FindStringSubmatch(cleaned)
+
+	if match != nil {
+		intlCode := ""
+		if match[1] != "" {
+			intlCode = "+62 "
+		}
+		return fmt.Sprintf("%s %s-%s-%s", intlCode, match[2], match[3], match[4])
+	}
+
+	return value
+}
+
+func DisplayNumber(value int64) string {
+	return formatNumberWithSeparator(value, getThousandSeparator("id-ID"))
+}
+
+func DisplayMoney(value int64) string {
+	return "Rp " + DisplayNumber(value)
+}
+
+func getThousandSeparator(locales string) string {
+	if strings.HasPrefix(locales, "id") {
+		return "."
+	}
+	return ","
+}
+
+func formatNumberWithSeparator(value int64, sep string) string {
+	n := fmt.Sprintf("%d", value)
+	if len(n) <= 3 {
+		return n
+	}
+
+	// Insert the thousand separator
+	var result strings.Builder
+	remain := len(n) % 3
+	if remain > 0 {
+		result.WriteString(n[:remain])
+		result.WriteString(sep)
+	}
+	for i := remain; i < len(n); i += 3 {
+		if i > remain {
+			result.WriteString(sep)
+		}
+		result.WriteString(n[i : i+3])
+	}
+	return result.String()
+}
+
+func DisplaySpkNumber(number int64, date time.Time) string {
+	return fmt.Sprintf("SPK-%03d/%d/%d", number, date.Month(), date.Year())
+}
+
+func DisplayInvoiceNumber(number int64, date time.Time) string {
+	return fmt.Sprintf("INVOICE-%03d/%d/%d", number, date.Month(), date.Year())
 }
