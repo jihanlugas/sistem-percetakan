@@ -1,4 +1,12 @@
 definitions:
+  constant.TransactionType:
+    enum:
+    - 1
+    - -1
+    type: integer
+    x-enum-varnames:
+    - TRANSACTION_TYPE_DEBIT
+    - TRANSACTION_TYPE_KREDIT
   request.AddPhase:
     properties:
       orderphaseId:
@@ -267,7 +275,7 @@ definitions:
       orderId:
         type: string
       type:
-        type: integer
+        $ref: '#/definitions/constant.TransactionType'
     required:
     - amount
     - companyId
@@ -368,6 +376,8 @@ definitions:
     type: object
   request.UpdateOrder:
     properties:
+      customerId:
+        type: string
       description:
         type: string
       name:
@@ -433,7 +443,7 @@ definitions:
       name:
         type: string
       type:
-        type: integer
+        $ref: '#/definitions/constant.TransactionType'
     required:
     - amount
     - name
@@ -736,6 +746,31 @@ paths:
       - BearerAuth: []
       tags:
       - Customer
+  /dashboard/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Order
   /design:
     get:
       consumes:
@@ -1943,6 +1978,31 @@ paths:
       - BearerAuth: []
       tags:
       - Print
+  /print/{id}/spk:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - BearerAuth: []
+      tags:
+      - Print
   /transaction:
     get:
       consumes:
@@ -2003,9 +2063,15 @@ paths:
       - in: query
         name: startDt
         type: string
-      - in: query
+      - enum:
+        - 1
+        - -1
+        in: query
         name: type
         type: integer
+        x-enum-varnames:
+        - TRANSACTION_TYPE_DEBIT
+        - TRANSACTION_TYPE_KREDIT
       produces:
       - application/json
       responses:

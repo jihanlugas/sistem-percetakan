@@ -172,6 +172,7 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdateOr
 
 	tOrder.Name = req.Name
 	tOrder.Description = req.Description
+	tOrder.CustomerID = req.CustomerID
 	tOrder.UpdateBy = loginUser.UserID
 	err = u.repository.Save(tx, tOrder)
 	if err != nil {

@@ -1,6 +1,7 @@
 package print
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/db"
@@ -9,6 +10,8 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/response"
 	"github.com/jihanlugas/sistem-percetakan/utils"
+	"html/template"
+	"os"
 )
 
 type Usecase interface {
@@ -17,6 +20,7 @@ type Usecase interface {
 	Create(loginUser jwt.UserLogin, req request.CreatePrint) error
 	Update(loginUser jwt.UserLogin, id string, req request.UpdatePrint) error
 	Delete(loginUser jwt.UserLogin, id string) error
+	GenerateSpk(id string) (pdfBytes []byte, vPrint model.PrintView, err error)
 }
 
 type usecase struct {
@@ -162,6 +166,63 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 	}
 
 	return err
+}
+
+func (u usecase) GenerateSpk(id string) (pdfBytes []byte, vPrint model.PrintView, err error) {
+	conn, closeConn := db.GetConnection()
+	defer closeConn()
+
+	preloads := []string{"Company", "Paper", "Order", "Order.Customer"}
+	vPrint, err = u.repository.GetViewById(conn, id, preloads...)
+	if err != nil {
+		return pdfBytes, vPrint, errors.New(fmt.Sprint("failed to get order: ", err))
+	}
+
+	pdfBytes, err = u.generateSpk(vPrint)
+
+	return pdfBytes, vPrint, err
+}
+
+func (u usecase) generateSpk(vPrint model.PrintView) (pdfBytes []byte, err error) {
+	tmpl := template.New("spk-print.html").Funcs(template.FuncMap{
+		"displayLembar": func(lembar int64) string {
+			return fmt.Sprintf("%s Lembar", utils.DisplayNumber(lembar))
+		},
+		"displayDuplex": func(isDuplex bool) string {
+			if isDuplex {
+				return "2 Muka"
+			}
+			return "1 Muka"
+		},
+		"displayDate":        utils.DisplayDate,
+		"displayDatetime":    utils.DisplayDatetime,
+		"displayNumber":      utils.DisplayNumber,
+		"displayMoney":       utils.DisplayMoney,
+		"displayPhoneNumber": utils.DisplayPhoneNumber,
+		"displaySpkNumber":   utils.DisplaySpkPrintNumber,
+	})
+
+	// Parse template setelah fungsi didaftarkan
+	tmpl, err = tmpl.ParseFiles("assets/template/spk-print.html")
+	if err != nil {
+		return pdfBytes, err
+	}
+
+	// Render template ke buffer
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, vPrint); err != nil {
+		return pdfBytes, err
+	}
+
+	// Simpan HTML render ke file sementara
+	tempHTMLFile := "temp.html"
+	if err := os.WriteFile(tempHTMLFile, buf.Bytes(), 0644); err != nil {
+		return pdfBytes, err
+	}
+	defer os.Remove(tempHTMLFile)
+
+	return utils.GeneratePDFWithChromedp(tempHTMLFile)
+
 }
 
 func NewUsecase(repository Repository) Usecase {

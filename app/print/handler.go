@@ -1,6 +1,8 @@
 package print
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/response"
@@ -8,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type Handler struct {
@@ -211,4 +214,36 @@ func (h Handler) Delete(c echo.Context) error {
 	}
 
 	return response.Success(http.StatusOK, response.SuccessHandler, nil).SendJSON(c)
+}
+
+// GenerateSpk
+// @Tags Print
+// @Security BearerAuth
+// @Accept json
+// @Produce json
+// @Param id path string true "ID"
+// @Query preloads query string false "preloads"
+// @Success      200  {object}	response.Response
+// @Failure      500  {object}  response.Response
+// @Router /print/{id}/spk [get]
+func (h Handler) GenerateSpk(c echo.Context) error {
+	var err error
+
+	id := c.Param("id")
+	if id == "" {
+		return response.Error(http.StatusBadRequest, response.ErrorHandlerGetParam, err, nil).SendJSON(c)
+	}
+
+	pdfBytes, vPrint, err := h.usecase.GenerateSpk(id)
+	if err != nil {
+		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
+	}
+
+	fmt.Print(fmt.Sprintf("%s SPK Print %s.pdf", utils.DisplayDate(time.Now()), vPrint.Name))
+
+	filename := fmt.Sprintf("%s SPK Print %s.pdf", utils.DisplayDate(time.Now()), vPrint.Name)
+	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
+
+	// Kirimkan PDF sebagai respons
+	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(pdfBytes))
 }

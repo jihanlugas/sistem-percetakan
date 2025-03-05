@@ -426,6 +426,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/dashboard/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Order"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/design": {
             "get": {
                 "security": [
@@ -2393,6 +2434,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/print/{id}/spk": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Print"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/transaction": {
             "get": {
                 "security": [
@@ -2500,7 +2582,15 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            1,
+                            -1
+                        ],
                         "type": "integer",
+                        "x-enum-varnames": [
+                            "TRANSACTION_TYPE_DEBIT",
+                            "TRANSACTION_TYPE_KREDIT"
+                        ],
                         "name": "type",
                         "in": "query"
                     }
@@ -3007,6 +3097,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "constant.TransactionType": {
+            "type": "integer",
+            "enum": [
+                1,
+                -1
+            ],
+            "x-enum-varnames": [
+                "TRANSACTION_TYPE_DEBIT",
+                "TRANSACTION_TYPE_KREDIT"
+            ]
+        },
         "request.AddPhase": {
             "type": "object",
             "required": [
@@ -3415,7 +3516,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "integer"
+                    "$ref": "#/definitions/constant.TransactionType"
                 }
             }
         },
@@ -3559,6 +3660,9 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
+                "customerId": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -3659,7 +3763,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "type": "integer"
+                    "$ref": "#/definitions/constant.TransactionType"
                 }
             }
         },

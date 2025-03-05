@@ -9,6 +9,7 @@ import (
 var PreloadPrint = []string{
 	"Company",
 	"Order",
+	"Order.Customer",
 	"Paper",
 }
 

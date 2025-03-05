@@ -6,6 +6,7 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/app/auth"
 	"github.com/jihanlugas/sistem-percetakan/app/company"
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
+	"github.com/jihanlugas/sistem-percetakan/app/dashboard"
 	"github.com/jihanlugas/sistem-percetakan/app/design"
 	"github.com/jihanlugas/sistem-percetakan/app/finishing"
 	"github.com/jihanlugas/sistem-percetakan/app/order"
@@ -56,6 +57,7 @@ func Init() *echo.Echo {
 	finishingUsecase := finishing.NewUsecase(finishingRepository)
 	otherUsecase := other.NewUsecase(otherRepository)
 	transactionUsecase := transaction.NewUsecase(transactionRepository)
+	dashboardUsecase := dashboard.NewUsecase(orderRepository, transactionRepository)
 
 	authHandler := auth.NewHandler(authUsecase)
 	userHandler := user.NewHandler(userUsecase)
@@ -68,6 +70,7 @@ func Init() *echo.Echo {
 	finishingHandler := finishing.NewHandler(finishingUsecase)
 	otherHandler := other.NewHandler(otherUsecase)
 	transactionHandler := transaction.NewHandler(transactionUsecase)
+	dashboardHandler := dashboard.NewHandler(dashboardUsecase)
 
 	if config.Debug {
 		router.GET("/", func(c echo.Context) error {
@@ -83,6 +86,9 @@ func Init() *echo.Echo {
 	routerAuth.POST("/sign-out", authHandler.SignOut)
 	routerAuth.GET("/init", authHandler.Init, checkTokenMiddleware)
 	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
+
+	routerDashboard := router.Group("/dashboard", checkTokenMiddleware)
+	routerDashboard.GET("/:id", dashboardHandler.GetDashboardById)
 
 	routerUser := router.Group("/user", checkTokenMiddleware)
 	routerUser.GET("", userHandler.Page)
@@ -136,6 +142,7 @@ func Init() *echo.Echo {
 	routerPrint.PUT("/:id", printHandler.Update)
 	routerPrint.GET("/:id", printHandler.GetById)
 	routerPrint.DELETE("/:id", printHandler.Delete)
+	routerPrint.GET("/:id/spk", printHandler.GenerateSpk)
 
 	routerFinishing := router.Group("/finishing", checkTokenMiddleware)
 	routerFinishing.GET("", finishingHandler.Page)

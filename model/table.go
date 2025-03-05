@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/jihanlugas/sistem-percetakan/constant"
 	"gorm.io/gorm"
 	"time"
 )
@@ -216,16 +217,16 @@ type Orderphase struct {
 }
 
 type Transaction struct {
-	ID          string         `gorm:"primaryKey" json:"id"`
-	CompanyID   string         `gorm:"not null" json:"companyId"`
-	OrderID     string         `gorm:"not null" json:"orderId"`
-	Name        string         `gorm:"not null" json:"name"`
-	Description string         `gorm:"not null" json:"description"`
-	Type        int64          `gorm:"not null" json:"type"`
-	Amount      int64          `gorm:"not null" json:"amount"`
-	CreateBy    string         `gorm:"not null" json:"createBy"`
-	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
-	UpdateBy    string         `gorm:"not null" json:"updateBy"`
-	UpdateDt    time.Time      `gorm:"not null" json:"updateDt"`
-	DeleteDt    gorm.DeletedAt `gorm:"null" json:"deleteDt"`
+	ID          string                   `gorm:"primaryKey" json:"id"`
+	CompanyID   string                   `gorm:"not null" json:"companyId"`
+	OrderID     string                   `gorm:"not null" json:"orderId"`
+	Name        string                   `gorm:"not null" json:"name"`
+	Description string                   `gorm:"not null" json:"description"`
+	Type        constant.TransactionType `gorm:"not null" json:"type"`
+	Amount      int64                    `gorm:"not null" json:"amount"`
+	CreateBy    string                   `gorm:"not null" json:"createBy"`
+	CreateDt    time.Time                `gorm:"not null" json:"createDt"`
+	UpdateBy    string                   `gorm:"not null" json:"updateBy"`
+	UpdateDt    time.Time                `gorm:"not null" json:"updateDt"`
+	DeleteDt    gorm.DeletedAt           `gorm:"null" json:"deleteDt"`
 }

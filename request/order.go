@@ -41,6 +41,7 @@ type CreateOrderDesign struct {
 type UpdateOrder struct {
 	Name        string `json:"name" form:"name" query:"name" validate:"required"`
 	Description string `json:"description" form:"description" query:"description" validate:""`
+	CustomerID  string `json:"customerId" form:"customerId" query:"customerId"`
 }
 
 type CreateOrderPrint struct {

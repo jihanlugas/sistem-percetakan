@@ -19,6 +19,7 @@ type Repository interface {
 	Save(conn *gorm.DB, tOrder model.Order) error
 	Delete(conn *gorm.DB, tOrder model.Order) error
 	Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.OrderView, count int64, err error)
+	Count(conn *gorm.DB, req request.PageOrder) (count int64, err error)
 }
 
 type repository struct {
@@ -107,7 +108,7 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 		query = query.Where("total_order <= ?", req.EndTotalOrder)
 	}
 
-	err = query.Count(&count).Error
+	count, err = r.count(query)
 	if err != nil {
 		return vOrders, count, err
 	}
@@ -128,6 +129,51 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 	}
 
 	return vOrders, count, err
+}
+
+func (r repository) Count(conn *gorm.DB, req request.PageOrder) (count int64, err error) {
+	query := conn.Model(&model.Order{})
+
+	preloads := strings.Split(req.Preloads, ",")
+	for _, preload := range preloads {
+		if utils.IsAvailablePreload(preload, model.PreloadOrder) {
+			query = query.Preload(preload)
+		}
+	}
+
+	if req.CompanyID != "" {
+		query = query.Where("company_id = ?", req.CompanyID)
+	}
+	if req.CustomerID != "" {
+		query = query.Where("customer_id = ?", req.CustomerID)
+	}
+	if req.PhaseID != "" {
+		query = query.Where("phase_id = ?", req.PhaseID)
+	}
+	if req.Name != "" {
+		query = query.Where("name ILIKE ?", "%"+req.Name+"%")
+	}
+	if req.Description != "" {
+		query = query.Where("description ILIKE ?", "%"+req.Description+"%")
+	}
+	if req.StartDt != nil {
+		query = query.Where("create_dt >= ?", req.StartDt)
+	}
+	if req.EndDt != nil {
+		query = query.Where("create_dt <= ?", req.EndDt)
+	}
+	if req.StartTotalOrder != nil {
+		query = query.Where("total_order >= ?", req.StartTotalOrder)
+	}
+	if req.EndTotalOrder != nil {
+		query = query.Where("total_order <= ?", req.EndTotalOrder)
+	}
+
+	return r.count(query)
+}
+
+func (r repository) count(query *gorm.DB) (count int64, err error) {
+	return count, query.Count(&count).Error
 }
 
 func NewRepository() Repository {

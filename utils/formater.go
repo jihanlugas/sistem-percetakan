@@ -164,6 +164,10 @@ func formatNumberWithSeparator(value int64, sep string) string {
 	return result.String()
 }
 
+func DisplaySpkPrintNumber(number int64, date time.Time) string {
+	return fmt.Sprintf("SPK-Print-%03d/%d/%d", number, date.Month(), date.Year())
+}
+
 func DisplaySpkNumber(number int64, date time.Time) string {
 	return fmt.Sprintf("SPK-%03d/%d/%d", number, date.Month(), date.Year())
 }

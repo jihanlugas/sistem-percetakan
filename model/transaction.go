@@ -11,6 +11,11 @@ var PreloadTransaction = []string{
 	"Order",
 }
 
+type TransactionPeriod struct {
+	Date   time.Time `json:"date"`
+	Amount int64     `json:"amount"`
+}
+
 func (m *Transaction) BeforeCreate(tx *gorm.DB) (err error) {
 	now := time.Now()
 
