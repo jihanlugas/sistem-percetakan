@@ -9,10 +9,8 @@ import (
 var PreloadOrder = []string{
 	"Company",
 	"Customer",
-	"Designs",
 	"Prints",
 	"Prints.Paper",
-	"Finishings",
 	"Others",
 	"Orderphases",
 	"Transactions",

@@ -125,13 +125,13 @@ func (h Handler) GenerateSpk(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}
 
-	fmt.Print(fmt.Sprintf("%s SPK %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name))
+	fmt.Print(fmt.Sprintf("SPK %s %s.pdf", vOrder.Name, utils.DisplayDate(time.Now())))
 
-	filename := fmt.Sprintf("%s SPK %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
+	filename := fmt.Sprintf("SPK %s %s.pdf", vOrder.Name, utils.DisplayDate(time.Now()))
 	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
 
 	// Kirimkan PDF sebagai respons
-	return c.Stream(http.StatusOK, "application/pdf", bytes.NewReader(pdfBytes))
+	return c.Blob(http.StatusOK, "application/pdf", pdfBytes)
 }
 
 // GenerateInvoice
@@ -157,9 +157,9 @@ func (h Handler) GenerateInvoice(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}
 
-	fmt.Print(fmt.Sprintf("%s Invoice %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name))
+	fmt.Print(fmt.Sprintf("Invoice %s %s.pdf", vOrder.Name, utils.DisplayDate(time.Now())))
 
-	filename := fmt.Sprintf("%s Invoice %s.pdf", utils.DisplayDate(time.Now()), vOrder.Name)
+	filename := fmt.Sprintf("Invoice %s %s.pdf", vOrder.Name, utils.DisplayDate(time.Now()))
 	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
 
 	// Kirimkan PDF sebagai respons

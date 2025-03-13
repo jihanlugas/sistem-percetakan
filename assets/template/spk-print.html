@@ -33,9 +33,13 @@
           <div class="">{{.Company.Address}}</div>
           <div class="">{{displayPhoneNumber .Company.PhoneNumber}}</div>
         </div>
+        {{ if .Company }}
+        {{ if ne .Company.PhotoID "" }}
         <div class="flex items-center justify-end">
-          <div>Logo</div>
+          <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="60" width="60">
         </div>
+        {{ end }}
+        {{ end }}
       </div>
       <hr class="border-2 mb-4 border-gray-300" />
       <div class="mb-2">

@@ -144,9 +144,7 @@ type OrderView struct {
 	OrderphaseID     string         `json:"orderphaseId"`
 	PhaseID          string         `json:"phaseId"`
 	OrderphaseName   string         `json:"orderphaseName"`
-	TotalDesign      int64          `json:"totalDesign"`
 	TotalPrint       int64          `json:"totalPrint"`
-	TotalFinishing   int64          `json:"totalFinishing"`
 	TotalOther       int64          `json:"totalOther"`
 	TotalTransaction int64          `json:"totalTransaction"`
 	TotalOrder       int64          `json:"totalOrder"`
@@ -158,9 +156,7 @@ type OrderView struct {
 
 	Company      *CompanyView      `json:"company,omitempty"`
 	Customer     *CustomerView     `json:"customer,omitempty"`
-	Designs      []DesignView      `json:"designs,omitempty" gorm:"foreignKey:OrderID"`
 	Prints       []PrintView       `json:"prints,omitempty" gorm:"foreignKey:OrderID"`
-	Finishings   []FinishingView   `json:"finishings,omitempty" gorm:"foreignKey:OrderID"`
 	Others       []OtherView       `json:"others,omitempty" gorm:"foreignKey:OrderID"`
 	Orderphases  []OrderphaseView  `json:"orderphases,omitempty" gorm:"foreignKey:OrderID"`
 	Transactions []TransactionView `json:"transactions,omitempty" gorm:"foreignKey:OrderID"`
@@ -193,34 +189,6 @@ func (PaperView) TableName() string {
 	return VIEW_PAPER
 }
 
-type DesignView struct {
-	ID            string         `json:"id"`
-	UsercompanyID string         `json:"usercompanyId"`
-	CompanyID     string         `json:"companyId"`
-	OrderID       string         `json:"orderId"`
-	Name          string         `json:"name"`
-	Description   string         `json:"description"`
-	Qty           int64          `json:"qty"`
-	Price         int64          `json:"price"`
-	Total         int64          `json:"total"`
-	CreateBy      string         `json:"createBy"`
-	CreateDt      time.Time      `json:"createDt"`
-	UpdateBy      string         `json:"updateBy"`
-	UpdateDt      time.Time      `json:"updateDt"`
-	DeleteDt      gorm.DeletedAt `json:"deleteDt"`
-	CompanyName   string         `json:"companyName"`
-	OrderName     string         `json:"orderName"`
-	CreateName    string         `json:"createName"`
-	UpdateName    string         `json:"updateName"`
-
-	Company *CompanyView `json:"company,omitempty"`
-	Order   *OrderView   `json:"order,omitempty"`
-}
-
-func (DesignView) TableName() string {
-	return VIEW_DESIGN
-}
-
 type PrintView struct {
 	ID          string         `json:"id"`
 	CompanyID   string         `json:"companyId"`
@@ -251,33 +219,6 @@ type PrintView struct {
 
 func (PrintView) TableName() string {
 	return VIEW_PRINT
-}
-
-type FinishingView struct {
-	ID          string         `json:"id"`
-	CompanyID   string         `json:"companyId"`
-	OrderID     string         `json:"orderId"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Qty         int64          `json:"qty"`
-	Price       int64          `json:"price"`
-	Total       int64          `json:"total"`
-	CreateBy    string         `json:"createBy"`
-	CreateDt    time.Time      `json:"createDt"`
-	UpdateBy    string         `json:"updateBy"`
-	UpdateDt    time.Time      `json:"updateDt"`
-	DeleteDt    gorm.DeletedAt `json:"deleteDt"`
-	CompanyName string         `json:"companyName"`
-	OrderName   string         `json:"orderName"`
-	CreateName  string         `json:"createName"`
-	UpdateName  string         `json:"updateName"`
-
-	Company *CompanyView `json:"company,omitempty"`
-	Order   *OrderView   `json:"order,omitempty"`
-}
-
-func (FinishingView) TableName() string {
-	return VIEW_FINISHING
 }
 
 type OtherView struct {

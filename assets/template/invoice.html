@@ -33,9 +33,13 @@
       <div class="">{{.Company.Address}}</div>
       <div class="">{{displayPhoneNumber .Company.PhoneNumber}}</div>
     </div>
+    {{ if .Company }}
+    {{ if ne .Company.PhotoID "" }}
     <div class="flex items-center justify-end">
-      <div>Logo</div>
+      <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="60" width="60">
     </div>
+    {{ end }}
+    {{ end }}
   </div>
   <hr class="border-2 mb-4 border-gray-300" />
   <div class="mb-2">
@@ -99,15 +103,6 @@
       </tr>
       </thead>
       <tbody>
-      {{range $design := .Designs}}
-      <tr class="border-gray-300">
-        <td class="py-1 px-1">{{$design.Name}}</td>
-        <td class="py-2 px-1 text-right">-</td>
-        <td class="py-1 px-1 text-right">{{ displayNumber $design.Qty}}</td>
-        <td class="py-1 px-1 text-right">{{ displayMoney $design.Price}}</td>
-        <td class="py-1 px-1 text-right">{{ displayMoney $design.Total}}</td>
-      </tr>
-      {{end}}
       {{range $print := .Prints}}
       <tr class="border-gray-300">
         <td class="py-1 px-1">
@@ -118,15 +113,6 @@
         <td class="py-1 px-1 text-right">{{ displayNumber $print.Qty}}</td>
         <td class="py-1 px-1 text-right">{{ displayMoney $print.Price}}</td>
         <td class="py-1 px-1 text-right">{{ displayMoney $print.Total}}</td>
-      </tr>
-      {{end}}
-      {{range $finishing := .Finishings}}
-      <tr class="border-gray-300">
-        <td class="py-1 px-1">{{$finishing.Name}}</td>
-        <td class="py-2 px-1 text-right">-</td>
-        <td class="py-1 px-1 text-right">{{ displayNumber $finishing.Qty}}</td>
-        <td class="py-1 px-1 text-right">{{ displayMoney $finishing.Price}}</td>
-        <td class="py-1 px-1 text-right">{{ displayMoney $finishing.Total}}</td>
       </tr>
       {{end}}
       {{range $other := .Others}}

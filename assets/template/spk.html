@@ -33,9 +33,13 @@
           <div class="">{{.Company.Address}}</div>
           <div class="">{{displayPhoneNumber .Company.PhoneNumber}}</div>
         </div>
+        {{ if .Company }}
+        {{ if ne .Company.PhotoID "" }}
         <div class="flex items-center justify-end">
-          <div>Logo</div>
+          <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="60" width="60">
         </div>
+        {{ end }}
+        {{ end }}
       </div>
       <hr class="border-2 mb-4 border-gray-300" />
       <div class="mb-2">
@@ -96,12 +100,6 @@
           </tr>
           </thead>
           <tbody>
-          {{range $design := .Designs}}
-          <tr class="border-gray-300">
-            <td class="py-1 px-1">{{$design.Name}}</td>
-            <td class="py-1 px-1 text-right">{{ displayNumber $design.Qty}}</td>
-          </tr>
-          {{end}}
           {{range $print := .Prints}}
           <tr class="border-gray-300">
             <td class="py-1 px-1">
@@ -109,12 +107,6 @@
               <div class="text-sm">{{$print.PaperName}} | {{ displayLembar $print.PageCount }} | {{ displayDuplex $print.IsDuplex }}</div>
             </td>
             <td class="py-1 px-1 text-right">{{ displayNumber $print.Qty}}</td>
-          </tr>
-          {{end}}
-          {{range $finishing := .Finishings}}
-          <tr class="border-gray-300">
-            <td class="py-1 px-1">{{$finishing.Name}}</td>
-            <td class="py-1 px-1 text-right">{{ displayNumber $finishing.Qty}}</td>
           </tr>
           {{end}}
           {{range $other := .Others}}

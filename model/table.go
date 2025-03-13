@@ -123,22 +123,6 @@ type Paper struct {
 	DeleteDt           gorm.DeletedAt `gorm:"null" json:"deleteDt"`
 }
 
-type Design struct {
-	ID          string         `gorm:"primaryKey" json:"id"`
-	CompanyID   string         `gorm:"not null" json:"companyId"`
-	OrderID     string         `gorm:"not null" json:"orderId"`
-	Name        string         `gorm:"not null" json:"name"`
-	Description string         `gorm:"not null" json:"description"`
-	Qty         int64          `gorm:"not null" json:"qty"`
-	Price       int64          `gorm:"not null" json:"price"`
-	Total       int64          `gorm:"not null" json:"total"`
-	CreateBy    string         `gorm:"not null" json:"createBy"`
-	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
-	UpdateBy    string         `gorm:"not null" json:"updateBy"`
-	UpdateDt    time.Time      `gorm:"not null" json:"updateDt"`
-	DeleteDt    gorm.DeletedAt `gorm:"null" json:"deleteDt"`
-}
-
 type Print struct {
 	ID          string         `gorm:"primaryKey" json:"id"`
 	CompanyID   string         `gorm:"not null" json:"companyId"`
@@ -148,22 +132,6 @@ type Print struct {
 	Description string         `gorm:"not null" json:"description"`
 	IsDuplex    bool           `gorm:"not null" json:"isDuplex"`
 	PageCount   int64          `gorm:"not null" json:"pageCount"`
-	Qty         int64          `gorm:"not null" json:"qty"`
-	Price       int64          `gorm:"not null" json:"price"`
-	Total       int64          `gorm:"not null" json:"total"`
-	CreateBy    string         `gorm:"not null" json:"createBy"`
-	CreateDt    time.Time      `gorm:"not null" json:"createDt"`
-	UpdateBy    string         `gorm:"not null" json:"updateBy"`
-	UpdateDt    time.Time      `gorm:"not null" json:"updateDt"`
-	DeleteDt    gorm.DeletedAt `gorm:"null" json:"deleteDt"`
-}
-
-type Finishing struct {
-	ID          string         `gorm:"primaryKey" json:"id"`
-	CompanyID   string         `gorm:"not null" json:"companyId"`
-	OrderID     string         `gorm:"not null" json:"orderId"`
-	Name        string         `gorm:"not null" json:"name"`
-	Description string         `gorm:"not null" json:"description"`
 	Qty         int64          `gorm:"not null" json:"qty"`
 	Price       int64          `gorm:"not null" json:"price"`
 	Total       int64          `gorm:"not null" json:"total"`

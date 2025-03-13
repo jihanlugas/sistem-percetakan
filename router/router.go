@@ -7,13 +7,12 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/app/company"
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
 	"github.com/jihanlugas/sistem-percetakan/app/dashboard"
-	"github.com/jihanlugas/sistem-percetakan/app/design"
-	"github.com/jihanlugas/sistem-percetakan/app/finishing"
 	"github.com/jihanlugas/sistem-percetakan/app/order"
 	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
 	"github.com/jihanlugas/sistem-percetakan/app/other"
 	"github.com/jihanlugas/sistem-percetakan/app/paper"
 	"github.com/jihanlugas/sistem-percetakan/app/phase"
+	"github.com/jihanlugas/sistem-percetakan/app/photo"
 	"github.com/jihanlugas/sistem-percetakan/app/print"
 	"github.com/jihanlugas/sistem-percetakan/app/transaction"
 	"github.com/jihanlugas/sistem-percetakan/app/user"
@@ -32,13 +31,12 @@ import (
 func Init() *echo.Echo {
 	router := websiteRouter()
 
+	photoRepository := photo.NewRepository()
 	userRepository := user.NewRepository()
 	companyRepository := company.NewRepository()
 	usercompanyRepository := usercompany.NewRepository()
 	orderRepository := order.NewRepository()
-	designRepository := design.NewRepository()
 	printRepository := print.NewRepository()
-	finishingRepository := finishing.NewRepository()
 	otherRepository := other.NewRepository()
 	orderphaseRepository := orderphase.NewRepository()
 	customerRepository := customer.NewRepository()
@@ -47,27 +45,25 @@ func Init() *echo.Echo {
 	transactionRepository := transaction.NewRepository()
 
 	authUsecase := auth.NewUsecase(userRepository, companyRepository, usercompanyRepository)
+	photoUsecase := photo.NewUsecase(photoRepository)
 	userUsecase := user.NewUsecase(userRepository, usercompanyRepository)
-	orderUsecase := order.NewUsecase(orderRepository, designRepository, printRepository, finishingRepository, otherRepository, orderphaseRepository, customerRepository, phaseRepository, transactionRepository)
+	orderUsecase := order.NewUsecase(orderRepository, printRepository, otherRepository, orderphaseRepository, customerRepository, phaseRepository, transactionRepository)
 	customerUsecase := customer.NewUsecase(customerRepository)
 	paperUsecase := paper.NewUsecase(paperRepository)
 	phaseUsecase := phase.NewUsecase(phaseRepository)
-	designUsecase := design.NewUsecase(designRepository)
 	printUsecase := print.NewUsecase(printRepository)
-	finishingUsecase := finishing.NewUsecase(finishingRepository)
 	otherUsecase := other.NewUsecase(otherRepository)
 	transactionUsecase := transaction.NewUsecase(transactionRepository)
 	dashboardUsecase := dashboard.NewUsecase(orderRepository, transactionRepository)
 
 	authHandler := auth.NewHandler(authUsecase)
+	photoHandler := photo.NewHandler(photoUsecase)
 	userHandler := user.NewHandler(userUsecase)
 	orderHandler := order.NewHandler(orderUsecase)
 	customerHandler := customer.NewHandler(customerUsecase)
 	paperHandler := paper.NewHandler(paperUsecase)
 	phaseHandler := phase.NewHandler(phaseUsecase)
-	designHandler := design.NewHandler(designUsecase)
 	printHandler := print.NewHandler(printUsecase)
-	finishingHandler := finishing.NewHandler(finishingUsecase)
 	otherHandler := other.NewHandler(otherUsecase)
 	transactionHandler := transaction.NewHandler(transactionUsecase)
 	dashboardHandler := dashboard.NewHandler(dashboardUsecase)
@@ -86,6 +82,9 @@ func Init() *echo.Echo {
 	routerAuth.POST("/sign-out", authHandler.SignOut)
 	routerAuth.GET("/init", authHandler.Init, checkTokenMiddleware)
 	routerAuth.GET("/refresh-token", authHandler.RefreshToken, checkTokenMiddleware)
+
+	routerPhoto := router.Group("/photo")
+	routerPhoto.GET("/:id", photoHandler.GetById)
 
 	routerDashboard := router.Group("/dashboard", checkTokenMiddleware)
 	routerDashboard.GET("/:id", dashboardHandler.GetDashboardById)
@@ -129,13 +128,6 @@ func Init() *echo.Echo {
 	routerPhase := router.Group("/phase", checkTokenMiddleware)
 	routerPhase.GET("", phaseHandler.Page)
 
-	routerDesign := router.Group("/design", checkTokenMiddleware)
-	routerDesign.GET("", designHandler.Page)
-	routerDesign.POST("", designHandler.Create)
-	routerDesign.PUT("/:id", designHandler.Update)
-	routerDesign.GET("/:id", designHandler.GetById)
-	routerDesign.DELETE("/:id", designHandler.Delete)
-
 	routerPrint := router.Group("/print", checkTokenMiddleware)
 	routerPrint.GET("", printHandler.Page)
 	routerPrint.POST("", printHandler.Create)
@@ -143,13 +135,6 @@ func Init() *echo.Echo {
 	routerPrint.GET("/:id", printHandler.GetById)
 	routerPrint.DELETE("/:id", printHandler.Delete)
 	routerPrint.GET("/:id/spk", printHandler.GenerateSpk)
-
-	routerFinishing := router.Group("/finishing", checkTokenMiddleware)
-	routerFinishing.GET("", finishingHandler.Page)
-	routerFinishing.POST("", finishingHandler.Create)
-	routerFinishing.PUT("/:id", finishingHandler.Update)
-	routerFinishing.GET("/:id", finishingHandler.GetById)
-	routerFinishing.DELETE("/:id", finishingHandler.Delete)
 
 	routerOther := router.Group("/other", checkTokenMiddleware)
 	routerOther.GET("", otherHandler.Page)

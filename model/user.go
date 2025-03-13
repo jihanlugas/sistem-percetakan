@@ -30,12 +30,8 @@ func (m *User) BeforeUpdate(tx *gorm.DB) (err error) {
 	return
 }
 
-//func (m *User) BeforeDelete(tx *gorm.DB) (err error) {
-//	return tx.Save(m).Error
-//}
-
 func (m *UserView) AfterFind(tx *gorm.DB) (err error) {
-	if m.PhotoUrl != "" {
+	if m.PhotoID != "" {
 		m.PhotoUrl = fmt.Sprintf("%s/%s", config.FileBaseUrl, m.PhotoUrl)
 	}
 	return

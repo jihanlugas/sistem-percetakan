@@ -21,6 +21,7 @@ type database struct {
 type server struct {
 	Address string
 	Port    string
+	BaseUrl string
 }
 
 var (
@@ -56,6 +57,7 @@ func init() {
 	Server = server{
 		Address: os.Getenv("SERVER_ADDRESS"),
 		Port:    os.Getenv("SERVER_PORT"),
+		BaseUrl: os.Getenv("SERVER_BASE_URL"),
 	}
 
 	Database = database{

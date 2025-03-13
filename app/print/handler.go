@@ -239,9 +239,9 @@ func (h Handler) GenerateSpk(c echo.Context) error {
 		return response.Error(http.StatusBadRequest, err.Error(), err, nil).SendJSON(c)
 	}
 
-	fmt.Print(fmt.Sprintf("%s SPK Print %s.pdf", utils.DisplayDate(time.Now()), vPrint.Name))
+	fmt.Print(fmt.Sprintf("SPK Print %s %s.pdf", vPrint.Name, utils.DisplayDate(time.Now())))
 
-	filename := fmt.Sprintf("%s SPK Print %s.pdf", utils.DisplayDate(time.Now()), vPrint.Name)
+	filename := fmt.Sprintf("SPK Print %s %s.pdf", vPrint.Name, utils.DisplayDate(time.Now()))
 	c.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
 
 	// Kirimkan PDF sebagai respons

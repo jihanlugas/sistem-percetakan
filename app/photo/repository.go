@@ -13,7 +13,7 @@ import (
 )
 
 type Repository interface {
-	GetByID(conn *gorm.DB, id string) (tPhoto model.Photo, err error)
+	GetById(conn *gorm.DB, id string) (tPhoto model.Photo, err error)
 	Upload(conn *gorm.DB, base64Image string, refTable constant.RefTable) (tPhoto model.Photo, err error)
 	Delete(conn *gorm.DB, id string) error
 }
@@ -21,7 +21,7 @@ type Repository interface {
 type repository struct {
 }
 
-func (r repository) GetByID(conn *gorm.DB, id string) (tPhoto model.Photo, err error) {
+func (r repository) GetById(conn *gorm.DB, id string) (tPhoto model.Photo, err error) {
 	return tPhoto, conn.Where("id = ?", id).First(&tPhoto).Error
 }
 
@@ -76,7 +76,7 @@ func (r repository) Upload(conn *gorm.DB, base64Image string, refTable constant.
 func (r repository) Delete(conn *gorm.DB, id string) error {
 	var err error
 
-	tPhoto, err := r.GetByID(conn, id)
+	tPhoto, err := r.GetById(conn, id)
 	if err != nil {
 		return err
 	}

@@ -17,25 +17,15 @@ type PageOrder struct {
 }
 
 type CreateOrder struct {
-	CompanyID        string                 `json:"companyId" form:"companyId" query:"companyId" validate:"required"`
-	CustomerID       string                 `json:"customerId" form:"customerId" query:"customerId"`
-	OrderphaseID     string                 `json:"orderphaseId" form:"orderphaseId" query:"orderphaseId" validate:""`
-	NewCustomer      string                 `json:"newCustomer" form:"newCustomer" query:"newCustomer" validate:""`
-	NewCustomerPhone string                 `json:"newCustomerPhone" form:"newCustomerPhone" query:"newCustomerPhone" validate:""`
-	Name             string                 `json:"name" form:"name" query:"name" validate:"required"`
-	Description      string                 `json:"description" form:"description" query:"description" validate:""`
-	Designs          []CreateOrderDesign    `json:"designs" form:"designs" query:"designs" validate:"dive"`
-	Prints           []CreateOrderPrint     `json:"prints" form:"prints" query:"prints" validate:"dive"`
-	Finishings       []CreateOrderFinishing `json:"finishings" form:"finishings" query:"finishings" validate:"dive"`
-	Others           []CreateOrderOther     `json:"others" form:"others" query:"others" validate:"dive"`
-}
-
-type CreateOrderDesign struct {
-	Name        string `json:"name" form:"name" query:"name" validate:"required"`
-	Description string `json:"description" form:"description" query:"description" validate:""`
-	Qty         int64  `json:"qty" form:"qty" query:"qty" validate:""`
-	Price       int64  `json:"price" form:"price" query:"price" validate:""`
-	Total       int64  `json:"total" form:"total" query:"total" validate:""`
+	CompanyID        string             `json:"companyId" form:"companyId" query:"companyId" validate:"required"`
+	CustomerID       string             `json:"customerId" form:"customerId" query:"customerId"`
+	OrderphaseID     string             `json:"orderphaseId" form:"orderphaseId" query:"orderphaseId" validate:""`
+	NewCustomer      string             `json:"newCustomer" form:"newCustomer" query:"newCustomer" validate:""`
+	NewCustomerPhone string             `json:"newCustomerPhone" form:"newCustomerPhone" query:"newCustomerPhone" validate:""`
+	Name             string             `json:"name" form:"name" query:"name" validate:"required"`
+	Description      string             `json:"description" form:"description" query:"description" validate:""`
+	Prints           []CreateOrderPrint `json:"prints" form:"prints" query:"prints" validate:"dive"`
+	Others           []CreateOrderOther `json:"others" form:"others" query:"others" validate:"dive"`
 }
 
 type UpdateOrder struct {
@@ -50,14 +40,6 @@ type CreateOrderPrint struct {
 	Description string `json:"description" form:"description" query:"description" validate:""`
 	IsDuplex    bool   `json:"isDuplex" form:"isDuplex" query:"isDuplex" validate:""`
 	PageCount   int64  `json:"pageCount" form:"pageCount" query:"pageCount" validate:""`
-	Qty         int64  `json:"qty" form:"qty" query:"qty" validate:""`
-	Price       int64  `json:"price" form:"price" query:"price" validate:""`
-	Total       int64  `json:"total" form:"total" query:"total" validate:""`
-}
-
-type CreateOrderFinishing struct {
-	Name        string `json:"name" form:"name" query:"name" validate:"required"`
-	Description string `json:"description" form:"description" query:"description" validate:""`
 	Qty         int64  `json:"qty" form:"qty" query:"qty" validate:""`
 	Price       int64  `json:"price" form:"price" query:"price" validate:""`
 	Total       int64  `json:"total" form:"total" query:"total" validate:""`

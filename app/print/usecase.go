@@ -194,12 +194,13 @@ func (u usecase) generateSpk(vPrint model.PrintView) (pdfBytes []byte, err error
 			}
 			return "1 Muka"
 		},
-		"displayDate":        utils.DisplayDate,
-		"displayDatetime":    utils.DisplayDatetime,
-		"displayNumber":      utils.DisplayNumber,
-		"displayMoney":       utils.DisplayMoney,
-		"displayPhoneNumber": utils.DisplayPhoneNumber,
-		"displaySpkNumber":   utils.DisplaySpkPrintNumber,
+		"displayImagePhotoId": utils.GetPhotoUrlById,
+		"displayDate":         utils.DisplayDate,
+		"displayDatetime":     utils.DisplayDatetime,
+		"displayNumber":       utils.DisplayNumber,
+		"displayMoney":        utils.DisplayMoney,
+		"displayPhoneNumber":  utils.DisplayPhoneNumber,
+		"displaySpkNumber":    utils.DisplaySpkPrintNumber,
 	})
 
 	// Parse template setelah fungsi didaftarkan
