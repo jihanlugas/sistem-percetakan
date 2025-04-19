@@ -399,7 +399,8 @@ func dbSeed() {
 			IsActive:          true,
 			AccountVerifiedDt: &now,
 			CreateBy:          adminID,
-			UpdateBy:          adminID},
+			UpdateBy:          adminID,
+		},
 		{
 			ID:                userID,
 			Role:              constant.RoleUseradmin,
