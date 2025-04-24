@@ -59,6 +59,7 @@ type Company struct {
 	Email       string         `gorm:"not null" json:"email"`
 	PhoneNumber string         `gorm:"not null" json:"phoneNumber"`
 	Address     string         `gorm:"not null" json:"address"`
+	InvoiceNote string         `gorm:"not null;default:''" json:"invoiceNote"`
 	PhotoID     string         `gorm:"not null" json:"photoId"`
 	CreateBy    string         `gorm:"not null" json:"createBy"`
 	CreateDt    time.Time      `gorm:"not null" json:"createDt"`

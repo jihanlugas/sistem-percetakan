@@ -66,6 +66,7 @@ type CompanyView struct {
 	Email       string         `json:"email"`
 	PhoneNumber string         `json:"phoneNumber"`
 	Address     string         `json:"address"`
+	InvoiceNote string         `json:"invoiceNote"`
 	PhotoID     string         `json:"photoId"`
 	PhotoUrl    string         `json:"photoUrl"`
 	CreateBy    string         `json:"createBy"`
