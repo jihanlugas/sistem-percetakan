@@ -28,8 +28,8 @@ type CreateCustomer struct {
 
 type UpdateCustomer struct {
 	Name        string `json:"name" form:"name" query:"name" validate:"required"`
-	Description string `json:"description" form:"description" query:"description" validate:"required"`
-	Address     string `json:"address" form:"address" query:"address" validate:"required"`
-	Email       string `json:"email" form:"email" query:"email" validate:"required,email"`
+	Description string `json:"description" form:"description" query:"description" validate:""`
+	Address     string `json:"address" form:"address" query:"address" validate:""`
+	Email       string `json:"email" form:"email" query:"email" validate:"email"`
 	PhoneNumber string `json:"phoneNumber" form:"phoneNumber" query:"phoneNumber"`
 }

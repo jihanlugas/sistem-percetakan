@@ -18,7 +18,7 @@
     .page {
       /* page-break-after: always; Ensure each div is treated as a new page */
       width: 150mm;
-      height: 148mm;
+      height: 210mm;
       margin: 0 auto;
       box-sizing: border-box;
       /*border: 1px solid #ccc;*/
@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-<div class="page p-8">
+<div class="page p-8 relative">
   <div class="grid grid-cols-2 gap-2 mb-2">
     <div>
       <div class="font-bold">{{.Company.Name}}</div>
@@ -36,7 +36,7 @@
     {{ if .Company }}
     {{ if ne .Company.PhotoID "" }}
     <div class="flex items-center justify-end">
-      <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="60" width="60">
+      <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="80" width="80">
     </div>
     {{ end }}
     {{ end }}
@@ -115,13 +115,13 @@
         <td class="py-1 px-1 text-right">{{ displayMoney $print.Total}}</td>
       </tr>
       {{end}}
-      {{range $other := .Others}}
+      {{range $finishing := .Finishings}}
       <tr class="border-gray-300">
-        <td class="py-1 px-1">{{$other.Name}}</td>
+        <td class="py-1 px-1">{{$finishing.Name}}</td>
         <td class="py-2 px-1 text-right">-</td>
-        <td class="py-1 px-1 text-right">{{ displayNumber $other.Qty}}</td>
-        <td class="py-1 px-1 text-right">{{ displayMoney $other.Price}}</td>
-        <td class="py-1 px-1 text-right">{{ displayMoney $other.Total}}</td>
+        <td class="py-1 px-1 text-right">{{ displayNumber $finishing.Qty}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $finishing.Price}}</td>
+        <td class="py-1 px-1 text-right">{{ displayMoney $finishing.Total}}</td>
       </tr>
       {{end}}
       </tbody>
@@ -155,6 +155,9 @@
         </div>
       </div>
     </div>
+  </div>
+  <div class="absolute bottom-4">
+    <div class="italic">Terima kasih atas kepercayaan dan kerjasama Anda.</div>
   </div>
 </div>
 </body>

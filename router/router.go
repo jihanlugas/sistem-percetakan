@@ -7,9 +7,9 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/app/company"
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
 	"github.com/jihanlugas/sistem-percetakan/app/dashboard"
+	"github.com/jihanlugas/sistem-percetakan/app/finishing"
 	"github.com/jihanlugas/sistem-percetakan/app/order"
 	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
-	"github.com/jihanlugas/sistem-percetakan/app/other"
 	"github.com/jihanlugas/sistem-percetakan/app/paper"
 	"github.com/jihanlugas/sistem-percetakan/app/phase"
 	"github.com/jihanlugas/sistem-percetakan/app/photo"
@@ -37,7 +37,7 @@ func Init() *echo.Echo {
 	usercompanyRepository := usercompany.NewRepository()
 	orderRepository := order.NewRepository()
 	printRepository := print.NewRepository()
-	otherRepository := other.NewRepository()
+	finishingRepository := finishing.NewRepository()
 	orderphaseRepository := orderphase.NewRepository()
 	customerRepository := customer.NewRepository()
 	paperRepository := paper.NewRepository()
@@ -47,12 +47,12 @@ func Init() *echo.Echo {
 	authUsecase := auth.NewUsecase(userRepository, companyRepository, usercompanyRepository)
 	photoUsecase := photo.NewUsecase(photoRepository)
 	userUsecase := user.NewUsecase(userRepository, usercompanyRepository)
-	orderUsecase := order.NewUsecase(orderRepository, printRepository, otherRepository, orderphaseRepository, customerRepository, phaseRepository, transactionRepository)
+	orderUsecase := order.NewUsecase(orderRepository, printRepository, finishingRepository, orderphaseRepository, customerRepository, phaseRepository, transactionRepository)
 	customerUsecase := customer.NewUsecase(customerRepository)
 	paperUsecase := paper.NewUsecase(paperRepository)
 	phaseUsecase := phase.NewUsecase(phaseRepository)
 	printUsecase := print.NewUsecase(printRepository)
-	otherUsecase := other.NewUsecase(otherRepository)
+	finishingUsecase := finishing.NewUsecase(finishingRepository)
 	transactionUsecase := transaction.NewUsecase(transactionRepository)
 	dashboardUsecase := dashboard.NewUsecase(orderRepository, transactionRepository)
 
@@ -64,7 +64,7 @@ func Init() *echo.Echo {
 	paperHandler := paper.NewHandler(paperUsecase)
 	phaseHandler := phase.NewHandler(phaseUsecase)
 	printHandler := print.NewHandler(printUsecase)
-	otherHandler := other.NewHandler(otherUsecase)
+	finishingHandler := finishing.NewHandler(finishingUsecase)
 	transactionHandler := transaction.NewHandler(transactionUsecase)
 	dashboardHandler := dashboard.NewHandler(dashboardUsecase)
 
@@ -136,12 +136,12 @@ func Init() *echo.Echo {
 	routerPrint.DELETE("/:id", printHandler.Delete)
 	routerPrint.GET("/:id/spk", printHandler.GenerateSpk)
 
-	routerOther := router.Group("/other", checkTokenMiddleware)
-	routerOther.GET("", otherHandler.Page)
-	routerOther.POST("", otherHandler.Create)
-	routerOther.PUT("/:id", otherHandler.Update)
-	routerOther.GET("/:id", otherHandler.GetById)
-	routerOther.DELETE("/:id", otherHandler.Delete)
+	routerFinishing := router.Group("/finishing", checkTokenMiddleware)
+	routerFinishing.GET("", finishingHandler.Page)
+	routerFinishing.POST("", finishingHandler.Create)
+	routerFinishing.PUT("/:id", finishingHandler.Update)
+	routerFinishing.GET("/:id", finishingHandler.GetById)
+	routerFinishing.DELETE("/:id", finishingHandler.Delete)
 
 	routerTransaction := router.Group("/transaction", checkTokenMiddleware)
 	routerTransaction.GET("", transactionHandler.Page)

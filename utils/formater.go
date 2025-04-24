@@ -10,14 +10,17 @@ import (
 )
 
 var regFormatHp *regexp.Regexp
+var replacer *strings.Replacer
 
 func init() {
-	regFormatHp = regexp.MustCompile(`(^\+?628)|(^0?8){1}`)
+	regFormatHp = regexp.MustCompile(`^(?:\+62|62|0)`)
+	replacer = strings.NewReplacer(" ", "", "-", "")
 }
 
 func FormatPhoneTo62(phone string) string {
-	formatPhone := regFormatHp.ReplaceAllString(strings.Replace(phone, " ", "", -1), "628")
-	return formatPhone
+	cleaned := replacer.Replace(phone)
+	formatted := regFormatHp.ReplaceAllString(cleaned, "62")
+	return formatted
 }
 
 // toCamelCase converts PascalCase or UpperCamelCase to camelCase

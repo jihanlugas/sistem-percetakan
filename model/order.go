@@ -11,7 +11,7 @@ var PreloadOrder = []string{
 	"Customer",
 	"Prints",
 	"Prints.Paper",
-	"Others",
+	"Finishings",
 	"Orderphases",
 	"Transactions",
 }

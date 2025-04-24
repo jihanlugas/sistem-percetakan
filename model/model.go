@@ -9,7 +9,7 @@ const (
 	VIEW_USERCOMPANY = "usercompanies_view"
 	VIEW_ORDER       = "orders_view"
 	VIEW_PRINT       = "prints_view"
-	VIEW_OTHER       = "others_view"
+	VIEW_FINISHING   = "finishings_view"
 	VIEW_CUSTOMER    = "customers_view"
 	VIEW_PAPER       = "papers_view"
 	VIEW_PHASE       = "phases_view"

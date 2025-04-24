@@ -66,7 +66,7 @@ func dbUpTable() {
 	if err != nil {
 		panic(err)
 	}
-	err = conn.Migrator().AutoMigrate(&model.Other{})
+	err = conn.Migrator().AutoMigrate(&model.Finishing{})
 	if err != nil {
 		panic(err)
 	}
@@ -187,10 +187,10 @@ func dbUpView() {
 			", orderphases.phase_id as phase_id" +
 			", orderphases.name as orderphase_name" +
 			", coalesce(prints.total_print, 0) as total_print" +
-			", coalesce(others.total_other, 0) as total_other" +
+			", coalesce(finishings.total_finishing, 0) as total_finishing" +
 			", coalesce(transactions.total_transaction, 0) as total_transaction" +
-			", coalesce(prints.total_print, 0) + coalesce(others.total_other, 0) as total_order" +
-			", coalesce(prints.total_print, 0) + coalesce(others.total_other, 0) - coalesce(transactions.total_transaction, 0) as outstanding" +
+			", coalesce(prints.total_print, 0) + coalesce(finishings.total_finishing, 0) as total_order" +
+			", coalesce(prints.total_print, 0) + coalesce(finishings.total_finishing, 0) - coalesce(transactions.total_transaction, 0) as outstanding" +
 			", companies.name as company_name, customers.name as customer_name, u1.fullname as create_name, u2.fullname as update_name").
 		Joins("left join orderphases orderphases on orderphases.order_id = orders.id " +
 			"AND orderphases.create_dt = (select max(orderphases.create_dt) from orderphases where orderphases.order_id = orders.id) " +
@@ -202,11 +202,11 @@ func dbUpView() {
 			"group by p.order_id " +
 			") as prints on prints.order_id = orders.id").
 		Joins("left join ( " +
-			"select o.order_id, COALESCE(sum(o.total), 0) as total_other " +
-			"from others o " +
+			"select o.order_id, COALESCE(sum(o.total), 0) as total_finishing " +
+			"from finishings o " +
 			"where o.delete_dt is null " +
 			"group by o.order_id " +
-			") as others on others.order_id = orders.id").
+			") as finishings on finishings.order_id = orders.id").
 		Joins("left join ( " +
 			"select p.order_id, COALESCE(sum(p.amount), 0) as total_transaction " +
 			"from transactions p " +
@@ -261,20 +261,20 @@ func dbUpView() {
 		panic(err)
 	}
 
-	err = conn.Migrator().DropView(model.VIEW_OTHER)
+	err = conn.Migrator().DropView(model.VIEW_FINISHING)
 	if err != nil {
 		panic(err)
 	}
-	vOther := conn.Model(&model.Other{}).Unscoped().
-		Select("others.*, companies.name as company_name, orders.name as order_name, u1.fullname as create_name, u2.fullname as update_name").
-		Joins("left join companies companies on companies.id = others.company_id").
-		Joins("left join orders orders on orders.id = others.order_id").
-		Joins("left join users u1 on u1.id = others.create_by").
-		Joins("left join users u2 on u2.id = others.update_by")
+	vFinishing := conn.Model(&model.Finishing{}).Unscoped().
+		Select("finishings.*, companies.name as company_name, orders.name as order_name, u1.fullname as create_name, u2.fullname as update_name").
+		Joins("left join companies companies on companies.id = finishings.company_id").
+		Joins("left join orders orders on orders.id = finishings.order_id").
+		Joins("left join users u1 on u1.id = finishings.create_by").
+		Joins("left join users u2 on u2.id = finishings.update_by")
 
-	err = conn.Migrator().CreateView(model.VIEW_OTHER, gorm.ViewOption{
+	err = conn.Migrator().CreateView(model.VIEW_FINISHING, gorm.ViewOption{
 		Replace: true,
-		Query:   vOther,
+		Query:   vFinishing,
 	})
 	if err != nil {
 		panic(err)
@@ -652,7 +652,7 @@ func dbSeedOrderMajalah(tx *gorm.DB, companyID, userID string, customer model.Cu
 	}
 	tx.Create(&prints)
 
-	others := []model.Other{
+	finishings := []model.Finishing{
 		{
 			ID:          utils.GetUniqueID(),
 			CompanyID:   companyID,
@@ -724,7 +724,7 @@ func dbSeedOrderMajalah(tx *gorm.DB, companyID, userID string, customer model.Cu
 			UpdateDt:    now,
 		},
 	}
-	tx.Create(&others)
+	tx.Create(&finishings)
 
 	transactions := []model.Transaction{
 		{
@@ -810,8 +810,8 @@ func dbSeedOrderBatikModel(tx *gorm.DB, companyID, userID string, customer model
 	}
 	tx.Create(&prints)
 
-	others := []model.Other{}
-	tx.Create(&others)
+	finishings := []model.Finishing{}
+	tx.Create(&finishings)
 
 	transactions := []model.Transaction{
 		{
@@ -917,7 +917,7 @@ func dbSeedOrderKartuNama(tx *gorm.DB, companyID, userID string, customer model.
 	}
 	tx.Create(&prints)
 
-	others := []model.Other{
+	finishings := []model.Finishing{
 		{
 			ID:          utils.GetUniqueID(),
 			CompanyID:   companyID,
@@ -947,7 +947,7 @@ func dbSeedOrderKartuNama(tx *gorm.DB, companyID, userID string, customer model.
 			UpdateDt:    now,
 		},
 	}
-	tx.Create(&others)
+	tx.Create(&finishings)
 
 	transactions := []model.Transaction{
 		{
@@ -1037,7 +1037,7 @@ func dbSeedOrderBanner(tx *gorm.DB, companyID, userID string, customer model.Cus
 	prints := []model.Print{}
 	tx.Create(&prints)
 
-	others := []model.Other{
+	finishings := []model.Finishing{
 		{
 			ID:          utils.GetUniqueID(),
 			CompanyID:   companyID,
@@ -1053,7 +1053,7 @@ func dbSeedOrderBanner(tx *gorm.DB, companyID, userID string, customer model.Cus
 			UpdateDt:    now,
 		},
 	}
-	tx.Create(&others)
+	tx.Create(&finishings)
 
 	transactions := []model.Transaction{
 		{
@@ -1130,7 +1130,7 @@ func dbSeedOrderNameTag(tx *gorm.DB, companyID, userID string, customer model.Cu
 	prints := []model.Print{}
 	tx.Create(&prints)
 
-	others := []model.Other{
+	finishings := []model.Finishing{
 		{
 			CompanyID:   companyID,
 			OrderID:     order.ID,
@@ -1159,7 +1159,7 @@ func dbSeedOrderNameTag(tx *gorm.DB, companyID, userID string, customer model.Cu
 			UpdateDt:    now,
 		},
 	}
-	tx.Create(&others)
+	tx.Create(&finishings)
 
 	transactions := []model.Transaction{
 		{
@@ -1284,7 +1284,7 @@ func dbSeedOrderStiker(tx *gorm.DB, companyID, userID string, customer model.Cus
 	}
 	tx.Create(&prints)
 
-	others := []model.Other{
+	finishings := []model.Finishing{
 		{
 			ID:          utils.GetUniqueID(),
 			CompanyID:   companyID,
@@ -1300,7 +1300,7 @@ func dbSeedOrderStiker(tx *gorm.DB, companyID, userID string, customer model.Cus
 			UpdateDt:    now,
 		},
 	}
-	tx.Create(&others)
+	tx.Create(&finishings)
 
 	transactions := []model.Transaction{
 		{

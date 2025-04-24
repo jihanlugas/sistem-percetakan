@@ -18,7 +18,7 @@
       .page {
         /* page-break-after: always; Ensure each div is treated as a new page */
         width: 150mm;
-        height: 148mm;
+        height: 210mm;
         margin: 0 auto;
         box-sizing: border-box;
         /*border: 1px solid #ccc;*/
@@ -36,7 +36,7 @@
         {{ if .Company }}
         {{ if ne .Company.PhotoID "" }}
         <div class="flex items-center justify-end">
-          <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="60" width="60">
+          <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="80" width="80">
         </div>
         {{ end }}
         {{ end }}

@@ -145,7 +145,7 @@ type OrderView struct {
 	PhaseID          string         `json:"phaseId"`
 	OrderphaseName   string         `json:"orderphaseName"`
 	TotalPrint       int64          `json:"totalPrint"`
-	TotalOther       int64          `json:"totalOther"`
+	TotalFinishing   int64          `json:"totalFinishing"`
 	TotalTransaction int64          `json:"totalTransaction"`
 	TotalOrder       int64          `json:"totalOrder"`
 	Outstanding      int64          `json:"outstanding"`
@@ -157,7 +157,7 @@ type OrderView struct {
 	Company      *CompanyView      `json:"company,omitempty"`
 	Customer     *CustomerView     `json:"customer,omitempty"`
 	Prints       []PrintView       `json:"prints,omitempty" gorm:"foreignKey:OrderID"`
-	Others       []OtherView       `json:"others,omitempty" gorm:"foreignKey:OrderID"`
+	Finishings   []FinishingView   `json:"finishings,omitempty" gorm:"foreignKey:OrderID"`
 	Orderphases  []OrderphaseView  `json:"orderphases,omitempty" gorm:"foreignKey:OrderID"`
 	Transactions []TransactionView `json:"transactions,omitempty" gorm:"foreignKey:OrderID"`
 }
@@ -221,7 +221,7 @@ func (PrintView) TableName() string {
 	return VIEW_PRINT
 }
 
-type OtherView struct {
+type FinishingView struct {
 	ID          string         `json:"id"`
 	CompanyID   string         `json:"companyId"`
 	OrderID     string         `json:"orderId"`
@@ -244,8 +244,8 @@ type OtherView struct {
 	Order   *OrderView   `json:"order,omitempty"`
 }
 
-func (OtherView) TableName() string {
-	return VIEW_OTHER
+func (FinishingView) TableName() string {
+	return VIEW_FINISHING
 }
 
 type PhaseView struct {

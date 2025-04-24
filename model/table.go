@@ -142,7 +142,7 @@ type Print struct {
 	DeleteDt    gorm.DeletedAt `gorm:"null" json:"deleteDt"`
 }
 
-type Other struct {
+type Finishing struct {
 	ID          string         `gorm:"primaryKey" json:"id"`
 	CompanyID   string         `gorm:"not null" json:"companyId"`
 	OrderID     string         `gorm:"not null" json:"orderId"`

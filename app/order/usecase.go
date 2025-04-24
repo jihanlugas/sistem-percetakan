@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
+	"github.com/jihanlugas/sistem-percetakan/app/finishing"
 	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
-	"github.com/jihanlugas/sistem-percetakan/app/other"
 	"github.com/jihanlugas/sistem-percetakan/app/phase"
 	"github.com/jihanlugas/sistem-percetakan/app/print"
 	"github.com/jihanlugas/sistem-percetakan/app/transaction"
@@ -37,7 +37,7 @@ type Usecase interface {
 type usecase struct {
 	repository            Repository
 	repositoryPrint       print.Repository
-	repositoryOther       other.Repository
+	repositoryFinishing   finishing.Repository
 	repositoryOrderphase  orderphase.Repository
 	repositoryCustomer    customer.Repository
 	repositoryPhase       phase.Repository
@@ -120,9 +120,9 @@ func (u usecase) Create(loginUser jwt.UserLogin, req request.CreateOrder) error 
 		return errors.New(fmt.Sprint("failed to create prints: ", err))
 	}
 
-	err = u.createOrderOthers(tx, loginUser, req.Others, req.CompanyID, tOrder.ID)
+	err = u.createOrderFinishings(tx, loginUser, req.Finishings, req.CompanyID, tOrder.ID)
 	if err != nil {
-		return errors.New(fmt.Sprint("failed to create others: ", err))
+		return errors.New(fmt.Sprint("failed to create finishings: ", err))
 	}
 
 	err = u.createOrderOrderphase(tx, loginUser, req.OrderphaseID, req.CompanyID, tOrder.ID)
@@ -298,27 +298,27 @@ func (u usecase) createOrderPrints(tx *gorm.DB, loginUser jwt.UserLogin, req []r
 	return err
 }
 
-func (u usecase) createOrderOthers(tx *gorm.DB, loginUser jwt.UserLogin, req []request.CreateOrderOther, companyId, orderId string) error {
+func (u usecase) createOrderFinishings(tx *gorm.DB, loginUser jwt.UserLogin, req []request.CreateOrderFinishing, companyId, orderId string) error {
 	var err error
-	var tOthers []model.Other
+	var tFinishings []model.Finishing
 	if len(req) > 0 {
-		for _, reqOther := range req {
-			tOther := model.Other{
+		for _, reqFinishing := range req {
+			tFinishing := model.Finishing{
 				ID:          utils.GetUniqueID(),
 				CompanyID:   companyId,
 				OrderID:     orderId,
-				Name:        reqOther.Name,
-				Description: reqOther.Description,
-				Qty:         reqOther.Qty,
-				Price:       reqOther.Price,
-				Total:       reqOther.Total,
+				Name:        reqFinishing.Name,
+				Description: reqFinishing.Description,
+				Qty:         reqFinishing.Qty,
+				Price:       reqFinishing.Price,
+				Total:       reqFinishing.Total,
 				CreateBy:    loginUser.UserID,
 				UpdateBy:    loginUser.UserID,
 			}
-			tOthers = append(tOthers, tOther)
+			tFinishings = append(tFinishings, tFinishing)
 		}
 
-		err = u.repositoryOther.Creates(tx, tOthers)
+		err = u.repositoryFinishing.Creates(tx, tFinishings)
 		if err != nil {
 			return err
 		}
@@ -383,9 +383,9 @@ func (u usecase) Delete(loginUser jwt.UserLogin, id string) error {
 		return errors.New(fmt.Sprint("failed to delete order print: ", err))
 	}
 
-	err = u.repositoryOther.DeleteByOrderId(tx, tOrder.ID)
+	err = u.repositoryFinishing.DeleteByOrderId(tx, tOrder.ID)
 	if err != nil {
-		return errors.New(fmt.Sprint("failed to delete order other: ", err))
+		return errors.New(fmt.Sprint("failed to delete order finishing: ", err))
 	}
 
 	err = tx.Commit().Error
@@ -400,7 +400,7 @@ func (u usecase) GenerateSpk(id string) (pdfBytes []byte, vOrder model.OrderView
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	preloads := []string{"Company", "Prints", "Prints.Paper", "Others", "Customer"}
+	preloads := []string{"Company", "Prints", "Prints.Paper", "Finishings", "Customer"}
 	vOrder, err = u.repository.GetViewById(conn, id, preloads...)
 	if err != nil {
 		return pdfBytes, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
@@ -457,7 +457,7 @@ func (u usecase) GenerateInvoice(id string) (pdfBytes []byte, vOrder model.Order
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
-	preloads := []string{"Company", "Prints", "Prints.Paper", "Others", "Customer", "Transactions"}
+	preloads := []string{"Company", "Prints", "Prints.Paper", "Finishings", "Customer", "Transactions"}
 	vOrder, err = u.repository.GetViewById(conn, id, preloads...)
 	if err != nil {
 		return pdfBytes, vOrder, errors.New(fmt.Sprint("failed to get order: ", err))
@@ -510,11 +510,11 @@ func (u usecase) generateInvoice(vOrder model.OrderView) (pdfBytes []byte, err e
 	return utils.GeneratePDFWithChromedp(tempHTMLFile)
 }
 
-func NewUsecase(repository Repository, repositoryPrint print.Repository, repositoryOther other.Repository, repositoryOrderphase orderphase.Repository, repositoryCustomer customer.Repository, repositoryPhase phase.Repository, repositoryTransaction transaction.Repository) Usecase {
+func NewUsecase(repository Repository, repositoryPrint print.Repository, repositoryFinishing finishing.Repository, repositoryOrderphase orderphase.Repository, repositoryCustomer customer.Repository, repositoryPhase phase.Repository, repositoryTransaction transaction.Repository) Usecase {
 	return &usecase{
 		repository:            repository,
 		repositoryPrint:       repositoryPrint,
-		repositoryOther:       repositoryOther,
+		repositoryFinishing:   repositoryFinishing,
 		repositoryOrderphase:  repositoryOrderphase,
 		repositoryCustomer:    repositoryCustomer,
 		repositoryPhase:       repositoryPhase,

@@ -18,7 +18,7 @@
       .page {
         /* page-break-after: always; Ensure each div is treated as a new page */
         width: 150mm;
-        height: 148mm;
+        height: 210mm;
         margin: 0 auto;
         box-sizing: border-box;
         /*border: 1px solid #ccc;*/
@@ -36,7 +36,7 @@
         {{ if .Company }}
         {{ if ne .Company.PhotoID "" }}
         <div class="flex items-center justify-end">
-          <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="60" width="60">
+          <img src="{{displayImagePhotoId .Company.PhotoID}}" alt="Logo" height="80" width="80">
         </div>
         {{ end }}
         {{ end }}
@@ -109,10 +109,13 @@
             <td class="py-1 px-1 text-right">{{ displayNumber $print.Qty}}</td>
           </tr>
           {{end}}
-          {{range $other := .Others}}
+          {{range $finishing := .Finishings}}
           <tr class="border-gray-300">
-            <td class="py-1 px-1">{{$other.Name}}</td>
-            <td class="py-1 px-1 text-right">{{ displayNumber $other.Qty}}</td>
+            <td class="py-1 px-1">
+              <div>{{$finishing.Name}}</div>
+              <div class="text-sm">{{$finishing.Description}}</div>
+            </td>
+            <td class="py-1 px-1 text-right">{{ displayNumber $finishing.Qty}}</td>
           </tr>
           {{end}}
           </tbody>
