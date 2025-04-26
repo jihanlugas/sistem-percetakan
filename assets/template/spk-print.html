@@ -18,7 +18,7 @@
       .page {
         /* page-break-after: always; Ensure each div is treated as a new page */
         width: 150mm;
-        height: 210mm;
+        height: auto;
         margin: 0 auto;
         box-sizing: border-box;
         /*border: 1px solid #ccc;*/
@@ -29,7 +29,7 @@
     <div class="page p-8">
       <div class="grid grid-cols-2 gap-2 mb-2">
         <div>
-          <div class="font-bold">{{.Company.Name}}</div>
+          <div class="font-bold text-3xl">{{.Company.Name}}</div>
           <div class="">{{.Company.Address}}</div>
           <div class="">{{displayPhoneNumber .Company.PhoneNumber}}</div>
         </div>
@@ -109,6 +109,16 @@
           </tr>
           </tbody>
         </table>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <div></div>
+        <div class="text-center">
+          <div class="mt-2">Tanggal: ...........................</div>
+          <div class="mt-20">........................................</div>
+        </div>
+      </div>
+      <div class="mt-8">
+        <div class="italic">Terima kasih atas kepercayaan dan kerjasama Anda.</div>
       </div>
     </div>
   </body>

@@ -25,15 +25,24 @@ func GeneratePDFWithChromedp(inputHTML string) ([]byte, error) {
 	htmlFile := fmt.Sprintf("file://%s/%s", fullPath, inputHTML)
 	var pdfBuffer []byte
 
+	var contentHeight float64
+
 	// Menggunakan cdproto/page untuk generate PDF
 	err = chromedp.Run(ctx,
 		chromedp.Navigate(htmlFile),
+		chromedp.WaitReady("body", chromedp.ByQuery),
+		chromedp.Evaluate(`document.body.scrollHeight`, &contentHeight),
 		chromedp.ActionFunc(func(ctx context.Context) error {
+			const pxPerInch = 96.0
+			heightInInch := contentHeight / pxPerInch
 			buf, _, err := page.PrintToPDF().
-				WithPrintBackground(true).
-				WithPaperWidth(4.1).  // A6 width in inches
-				WithPaperHeight(5.8). // A6 height in inches
-				//WithScale(0.5).
+				WithPaperWidth(5.9).
+				WithPaperHeight(heightInInch).
+				WithMarginTop(0).
+				WithMarginBottom(0).
+				WithMarginLeft(0).
+				WithMarginRight(0).
+				WithPreferCSSPageSize(false).
 				Do(ctx)
 			if err != nil {
 				return err
