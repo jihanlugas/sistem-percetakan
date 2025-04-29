@@ -125,7 +125,7 @@ func (r repository) Page(conn *gorm.DB, req request.PageTransaction) (vTransacti
 	if req.SortField != "" {
 		query = query.Order(fmt.Sprintf("%s %s", req.SortField, req.SortOrder))
 	} else {
-		query = query.Order(fmt.Sprintf("%s %s", "name", "asc"))
+		query = query.Order(fmt.Sprintf("%s %s", "create_dt", "desc"))
 	}
 
 	if req.Limit >= 0 {
