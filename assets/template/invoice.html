@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-<div class="page p-8">
+<div class="page p-8 relative">
   <div class="grid grid-cols-2 gap-2 mb-2">
     <div>
       <div class="font-bold text-3xl">{{.Company.Name}}</div>
@@ -131,7 +131,7 @@
     <div class="grid grid-cols-2 gap-4">
       <div></div>
       <div>
-        <div class="flex justify-between px-1">
+        <div class="flex justify-between px-1 font-bold">
           <div>Total Order</div>
           <div>{{ displayMoney .TotalOrder}}</div>
         </div>
@@ -144,15 +144,17 @@
           </div>
           {{end}}
         {{end}}
-        <div class="flex justify-between px-1">
+        <div class="flex justify-between px-1 font-bold">
           <div>Total Pembayaran</div>
           <div>{{ displayMoney .TotalTransaction}}</div>
         </div>
-        <hr class="border-1 border-gray-300 my-1" />
-        <div class="flex justify-between px-1">
-          <div>Sisa Pembayaran</div>
-          <div>{{ displayMoney .Outstanding}}</div>
-        </div>
+        {{if gt .Outstanding 0}}
+          <hr class="border-1 border-gray-300 my-1" />
+          <div class="flex justify-between px-1 font-bold text-rose-500">
+            <div>Sisa Pembayaran</div>
+            <div>{{ displayMoney .Outstanding}}</div>
+          </div>
+        {{end}}
       </div>
     </div>
   </div>
@@ -162,6 +164,11 @@
   <div class="mt-8">
     <div class="italic">Terima kasih atas kepercayaan dan kerjasama Anda.</div>
   </div>
+  {{if le .Outstanding 0}}
+  <div class="absolute text-8xl -rotate-30 font-bold opacity-15 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-2 border-4 text-rose-500 border-rose-500">
+    <div class="border-2 border-rose-500 p-8">LUNAS</div>
+  </div>
+  {{end}}
 </div>
 </body>
 </html>
