@@ -55,9 +55,11 @@ func Init() *echo.Echo {
 	finishingUsecase := finishing.NewUsecase(finishingRepository)
 	transactionUsecase := transaction.NewUsecase(transactionRepository)
 	dashboardUsecase := dashboard.NewUsecase(orderRepository, transactionRepository)
+	companyUsecase := company.NewUsecase(companyRepository, usercompanyRepository)
 
 	authHandler := auth.NewHandler(authUsecase)
 	photoHandler := photo.NewHandler(photoUsecase)
+	companyHandler := company.NewHandler(companyUsecase)
 	userHandler := user.NewHandler(userUsecase)
 	orderHandler := order.NewHandler(orderUsecase)
 	customerHandler := customer.NewHandler(customerUsecase)
@@ -96,6 +98,9 @@ func Init() *echo.Echo {
 	routerUser.PUT("/:id", userHandler.Update)
 	routerUser.GET("/:id", userHandler.GetById)
 	routerUser.DELETE("/:id", userHandler.Delete)
+
+	routerCompany := router.Group("/company", checkTokenMiddleware)
+	routerCompany.PUT("/:id", companyHandler.Update)
 
 	routerOrder := router.Group("/order", checkTokenMiddleware)
 	routerOrder.GET("", orderHandler.Page)

@@ -134,7 +134,7 @@ func existsDataOnDbTable(fl validator.FieldLevel) bool {
 		return true
 	case "company_id":
 		ID := fl.Field().String()
-		_, err = companyRepo.GetById(conn, ID)
+		_, err = companyRepo.GetTableById(conn, ID)
 		if err != nil {
 			return false
 		}

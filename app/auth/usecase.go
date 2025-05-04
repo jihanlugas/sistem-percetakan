@@ -62,7 +62,7 @@ func (u usecase) SignIn(req request.Signin) (token string, userLogin jwt.UserLog
 			return "", userLogin, errors.New("usercompany not found : " + err.Error())
 		}
 
-		tCompany, err = u.companyRepository.GetById(conn, tUsercompany.CompanyID)
+		tCompany, err = u.companyRepository.GetTableById(conn, tUsercompany.CompanyID)
 		if err != nil {
 			return "", userLogin, errors.New("company not found : " + err.Error())
 		}

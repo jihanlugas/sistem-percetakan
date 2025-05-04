@@ -8,8 +8,8 @@ import (
 )
 
 type Repository interface {
-	GetById(conn *gorm.DB, id string) (tCompany model.Company, err error)
-	GetByName(conn *gorm.DB, name string) (tCompany model.Company, err error)
+	GetTableById(conn *gorm.DB, id string) (tCompany model.Company, err error)
+	GetTableByName(conn *gorm.DB, name string) (tCompany model.Company, err error)
 	GetViewById(conn *gorm.DB, id string) (vCompany model.CompanyView, err error)
 	GetViewByName(conn *gorm.DB, name string) (vCompany model.CompanyView, err error)
 	Create(conn *gorm.DB, tCompany model.Company) error
@@ -22,12 +22,12 @@ type Repository interface {
 type repository struct {
 }
 
-func (r repository) GetById(conn *gorm.DB, id string) (tCompany model.Company, err error) {
+func (r repository) GetTableById(conn *gorm.DB, id string) (tCompany model.Company, err error) {
 	err = conn.Where("id = ? ", id).First(&tCompany).Error
 	return tCompany, err
 }
 
-func (r repository) GetByName(conn *gorm.DB, name string) (tCompany model.Company, err error) {
+func (r repository) GetTableByName(conn *gorm.DB, name string) (tCompany model.Company, err error) {
 	err = conn.Where("name = ? ", name).First(&tCompany).Error
 	return tCompany, err
 }

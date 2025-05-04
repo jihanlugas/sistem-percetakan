@@ -7,7 +7,7 @@
   <title>Invoice - {{.CompanyName}}</title>
   <style>
     html {
-      font-size: 12px;
+      font-size: 13px;
     }
     body,
     pre {
@@ -30,7 +30,7 @@
   <div class="grid grid-cols-2 gap-2 mb-2">
     <div>
       <div class="font-bold text-3xl">{{.Company.Name}}</div>
-      <div class="">{{.Company.Address}}</div>
+      <div class="whitespace-pre-wrap">{{.Company.Address}}</div>
       <div class="">{{displayPhoneNumber .Company.PhoneNumber}}</div>
     </div>
     {{ if .Company }}
