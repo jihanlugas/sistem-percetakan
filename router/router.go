@@ -225,13 +225,3 @@ func checkTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
-
-//func checkAdminMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-//	return func(c echo.Context) error {
-//		userLogin := c.Get(constant.TokenUserContext).(*jwt.UserLogin)
-//		if !userLogin.IsAdmin {
-//			return response.ErrorForce(http.StatusForbidden, response.ErrorMiddlewareNotAdmin).SendJSON(c)
-//		}
-//		return next(c)
-//	}
-//}
