@@ -107,6 +107,9 @@ func (r repository) Page(conn *gorm.DB, req request.PageOrder) (vOrders []model.
 	if req.EndTotalOrder != nil {
 		query = query.Where("total_order <= ?", req.EndTotalOrder)
 	}
+	if req.CreateName != "" {
+		query = query.Where("create_name ILIKE ?", "%"+req.CreateName+"%")
+	}
 
 	count, err = r.count(query)
 	if err != nil {

@@ -45,7 +45,7 @@ func (u usecase) GetById(loginUser jwt.UserLogin, id string, preloads ...string)
 
 	vPrint, err = u.repository.GetViewById(conn, id, preloads...)
 	if err != nil {
-		return vPrint, errors.New(fmt.Sprint("failed to get order: ", err))
+		return vPrint, errors.New(fmt.Sprint("failed to get print: ", err))
 	}
 
 	if jwt.IsSaveCompanyIDOR(loginUser, vPrint.CompanyID) {

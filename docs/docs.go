@@ -828,6 +828,11 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "name": "createName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "name": "customerId",
                         "in": "query"
                     },

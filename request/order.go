@@ -14,6 +14,7 @@ type PageOrder struct {
 	EndDt           *time.Time `json:"endDt" form:"endDt" query:"endDt"`
 	StartTotalOrder *int64     `json:"startTotalOrder" form:"startTotalOrder" query:"startTotalOrder"`
 	EndTotalOrder   *int64     `json:"endTotalOrder" form:"endTotalOrder" query:"endTotalOrder"`
+	CreateName      string     `json:"createName" form:"createName" query:"createName"`
 }
 
 type CreateOrder struct {

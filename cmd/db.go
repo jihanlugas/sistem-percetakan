@@ -377,7 +377,7 @@ func dbSeed() {
 	userID := "f7416f17-884b-46d3-b7db-b90be60a71c5"
 	companyID := "fcc18dfc-b0ef-42ef-8036-28503492a2a1"
 	companyPhotoID := "05421e10-6e09-4ae0-9102-7947b2166d30"
-
+	
 	now := time.Now()
 
 	password, err := cryption.EncryptAES64("123456")
