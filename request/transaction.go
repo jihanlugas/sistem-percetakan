@@ -1,8 +1,9 @@
 package request
 
 import (
-	"github.com/jihanlugas/sistem-percetakan/constant"
 	"time"
+
+	"github.com/jihanlugas/sistem-percetakan/constant"
 )
 
 type PageTransaction struct {
@@ -30,6 +31,7 @@ type CreateTransaction struct {
 	Description string                   `json:"description" form:"description" query:"description" validate:""`
 	Type        constant.TransactionType `json:"type" form:"type" query:"type"`
 	Amount      int64                    `json:"amount" form:"amount" query:"amount" validate:"required"`
+	PaymentType constant.PaymentType     `json:"paymentType" form:"paymentType" query:"paymentType"`
 }
 
 type UpdateTransaction struct {
@@ -37,4 +39,5 @@ type UpdateTransaction struct {
 	Description string                   `json:"description" form:"description" query:"description" validate:""`
 	Type        constant.TransactionType `json:"type" form:"type" query:"type"`
 	Amount      int64                    `json:"amount" form:"amount" query:"amount" validate:"required"`
+	PaymentType constant.PaymentType     `json:"paymentType" form:"paymentType" query:"paymentType"`
 }

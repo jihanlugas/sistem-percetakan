@@ -2,13 +2,14 @@ package transaction
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/jihanlugas/sistem-percetakan/constant"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
 	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
-	"strings"
-	"time"
 )
 
 type Repository interface {
@@ -22,7 +23,7 @@ type Repository interface {
 	DeleteByOrderId(conn *gorm.DB, id string) error
 	Page(conn *gorm.DB, req request.PageTransaction) (vTransactions []model.TransactionView, count int64, err error)
 	GetDailyAmountPeriod(conn *gorm.DB, companyID string, transactionType constant.TransactionType, startDt, endDt time.Time) (data []model.TransactionPeriod, err error)
-	GetTotalAmountPeriod(conn *gorm.DB, companyID string, transactionType constant.TransactionType, startDt, endDt time.Time) (total_amount int64, err error)
+	GetTotalAmountPeriodPaymentType(conn *gorm.DB, companyID string, transactionType constant.TransactionType, paymentType constant.PaymentType, startDt, endDt time.Time) (total_amount int64, err error)
 }
 
 type repository struct {
@@ -171,6 +172,20 @@ func (r repository) GetTotalAmountPeriod(conn *gorm.DB, companyID string, transa
 		AND create_dt BETWEEN ? AND ?
 		AND delete_dt is null
 	`, companyID, transactionType, startDt, endDt).Scan(&total_amount).Error
+
+	return total_amount, err
+}
+
+func (r repository) GetTotalAmountPeriodPaymentType(conn *gorm.DB, companyID string, transactionType constant.TransactionType, paymentType constant.PaymentType, startDt, endDt time.Time) (total_amount int64, err error) {
+	err = conn.Raw(`
+		SELECT COALESCE(SUM(amount), 0) AS total_amount
+		FROM transactions
+		WHERE company_id = ?
+		AND type = ?
+		AND payment_type = ?
+		AND create_dt BETWEEN ? AND ?
+		AND delete_dt is null
+	`, companyID, transactionType, paymentType, startDt, endDt).Scan(&total_amount).Error
 
 	return total_amount, err
 }

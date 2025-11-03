@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"time"
+
 	"github.com/jihanlugas/sistem-percetakan/app/order"
 	"github.com/jihanlugas/sistem-percetakan/app/transaction"
 	"github.com/jihanlugas/sistem-percetakan/constant"
@@ -8,7 +10,7 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/model"
 	"github.com/jihanlugas/sistem-percetakan/request"
-	"time"
+	"gorm.io/gorm"
 )
 
 type Usecase interface {
@@ -24,44 +26,22 @@ func (u usecase) GetDashboard(loginUser jwt.UserLogin, companyID string) (dashbo
 	var lineChart model.LineChart
 	var dataDebit []int64
 	var dataKredit []int64
-	var totalDebit int64
-	var totalKredit int64
-	var totalOrder int64
 
 	conn, closeConn := db.GetConnection()
 	defer closeConn()
 
 	now := time.Now()
 	startDtADay := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	startDtAWeek := startDtADay.AddDate(0, 0, -6)
+	startDtAWeek := startDtADay.AddDate(0, 0, -7)
+	startDtAMonth := startDtADay.AddDate(0, 0, -30)
 	endDt := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, time.Local)
 
-	totalDebit, err = u.repositoryTransaction.GetTotalAmountPeriod(conn, companyID, constant.TRANSACTION_TYPE_DEBIT, startDtADay, endDt)
+	debitTransactions, err := u.repositoryTransaction.GetDailyAmountPeriod(conn, companyID, constant.TRANSACTION_TYPE_DEBIT, startDtAMonth, endDt)
 	if err != nil {
 		return
 	}
 
-	totalKredit, err = u.repositoryTransaction.GetTotalAmountPeriod(conn, companyID, constant.TRANSACTION_TYPE_KREDIT, startDtADay, endDt)
-	if err != nil {
-		return
-	}
-
-	debitTransactions, err := u.repositoryTransaction.GetDailyAmountPeriod(conn, companyID, constant.TRANSACTION_TYPE_DEBIT, startDtAWeek, endDt)
-	if err != nil {
-		return
-	}
-
-	kreditTransactions, err := u.repositoryTransaction.GetDailyAmountPeriod(conn, companyID, constant.TRANSACTION_TYPE_KREDIT, startDtAWeek, endDt)
-	if err != nil {
-		return
-	}
-
-	reqOrder := request.PageOrder{
-		CompanyID: companyID,
-		StartDt:   &startDtADay,
-		EndDt:     &endDt,
-	}
-	totalOrder, err = u.repositoryOrder.Count(conn, reqOrder)
+	kreditTransactions, err := u.repositoryTransaction.GetDailyAmountPeriod(conn, companyID, constant.TRANSACTION_TYPE_KREDIT, startDtAMonth, endDt)
 	if err != nil {
 		return
 	}
@@ -92,12 +72,81 @@ func (u usecase) GetDashboard(loginUser jwt.UserLogin, companyID string) (dashbo
 		BackgroundColor: "rgba(255, 32, 86, 0.2)",
 	})
 
+	totalDebitCashOneDay, totalKreditCashOneDay, totalDebitTransferOneDay, totalKreditTransferOneDay, totalOrderOneDay, err := u.getDataPeroid(conn, companyID, startDtADay, endDt)
+	if err != nil {
+		return dashboard, err
+	}
+
+	totalDebitCashOneWeek, totalKreditCashOneWeek, totalDebitTransferOneWeek, totalKreditTransferOneWeek, totalOrderOneWeek, err := u.getDataPeroid(conn, companyID, startDtAWeek, endDt)
+	if err != nil {
+		return dashboard, err
+	}
+
+	totalDebitCashOneMonth, totalKreditCashOneMonth, totalDebitTransferOneMonth, totalKreditTransferOneMonth, totalOrderOneMonth, err := u.getDataPeroid(conn, companyID, startDtAMonth, endDt)
+	if err != nil {
+		return dashboard, err
+	}
+
 	dashboard.ChartTransaction = lineChart
-	dashboard.TotalDebit = totalDebit
-	dashboard.TotalKredit = totalKredit
-	dashboard.TotalOrder = totalOrder
+	dashboard.TransactionOneDay = model.DasboardTransaction{
+		TotalDebitCash:      totalDebitCashOneDay,
+		TotalKreditCash:     totalKreditCashOneDay,
+		TotalDebitTransfer:  totalDebitTransferOneDay,
+		TotalKreditTransfer: totalKreditTransferOneDay,
+		TotalOrder:          totalOrderOneDay,
+	}
+	dashboard.TransactionOneWeek = model.DasboardTransaction{
+		TotalDebitCash:      totalDebitCashOneWeek,
+		TotalKreditCash:     totalKreditCashOneWeek,
+		TotalDebitTransfer:  totalDebitTransferOneWeek,
+		TotalKreditTransfer: totalKreditTransferOneWeek,
+		TotalOrder:          totalOrderOneWeek,
+	}
+	dashboard.TransactionOneMonth = model.DasboardTransaction{
+		TotalDebitCash:      totalDebitCashOneMonth,
+		TotalKreditCash:     totalKreditCashOneMonth,
+		TotalDebitTransfer:  totalDebitTransferOneMonth,
+		TotalKreditTransfer: totalKreditTransferOneMonth,
+		TotalOrder:          totalOrderOneMonth,
+	}
 
 	return dashboard, err
+}
+
+func (u usecase) getDataPeroid(conn *gorm.DB, companyID string, startDt, endDt time.Time) (totalDebitCash, totalKreditCash, totalDebitTrasnfer, totalKreditTrasnfer, totalOrder int64, err error) {
+	totalDebitCash, err = u.repositoryTransaction.GetTotalAmountPeriodPaymentType(conn, companyID, constant.TRANSACTION_TYPE_DEBIT, constant.PAYMENT_TYPE_CASH, startDt, endDt)
+	if err != nil {
+		return
+	}
+
+	totalKreditCash, err = u.repositoryTransaction.GetTotalAmountPeriodPaymentType(conn, companyID, constant.TRANSACTION_TYPE_KREDIT, constant.PAYMENT_TYPE_CASH, startDt, endDt)
+	if err != nil {
+		return
+	}
+
+	totalDebitTrasnfer, err = u.repositoryTransaction.GetTotalAmountPeriodPaymentType(conn, companyID, constant.TRANSACTION_TYPE_DEBIT, constant.PAYMENT_TYPE_TRANSFER, startDt, endDt)
+	if err != nil {
+		return
+	}
+
+	totalKreditTrasnfer, err = u.repositoryTransaction.GetTotalAmountPeriodPaymentType(conn, companyID, constant.TRANSACTION_TYPE_KREDIT, constant.PAYMENT_TYPE_TRANSFER, startDt, endDt)
+	if err != nil {
+		return
+	}
+
+	reqOrder := request.PageOrder{
+		CompanyID: companyID,
+		StartDt:   &startDt,
+		EndDt:     &endDt,
+	}
+
+	totalOrder, err = u.repositoryOrder.Count(conn, reqOrder)
+	if err != nil {
+		return
+	}
+
+	return
+
 }
 
 func NewUsecase(repositoryOrder order.Repository, repositoryTransaction transaction.Repository) Usecase {

@@ -1,6 +1,10 @@
 package request
 
-import "time"
+import (
+	"time"
+
+	"github.com/jihanlugas/sistem-percetakan/constant"
+)
 
 type PageOrder struct {
 	Paging
@@ -59,7 +63,8 @@ type AddPhase struct {
 }
 
 type AddTransaction struct {
-	Name        string `json:"name" form:"name" query:"name" validate:"required"`
-	Description string `json:"description" form:"description" query:"description" validate:""`
-	Amount      int64  `json:"amount" form:"amount" query:"amount" validate:"required"`
+	Name        string               `json:"name" form:"name" query:"name" validate:"required"`
+	Description string               `json:"description" form:"description" query:"description" validate:""`
+	Amount      int64                `json:"amount" form:"amount" query:"amount" validate:"required"`
+	PaymentType constant.PaymentType `json:"paymentType" form:"paymentType" query:"paymentType"`
 }

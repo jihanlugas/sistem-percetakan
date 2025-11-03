@@ -1,8 +1,9 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type PhotoView struct {
@@ -302,6 +303,7 @@ type TransactionView struct {
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
 	Type        int64          `json:"type"`
+	PaymentType string         `json:"paymentType"`
 	Amount      int64          `json:"amount"`
 	CreateBy    string         `json:"createBy"`
 	CreateDt    time.Time      `json:"createDt"`

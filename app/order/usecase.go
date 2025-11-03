@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"html/template"
+	"os"
+
 	"github.com/jihanlugas/sistem-percetakan/app/customer"
 	"github.com/jihanlugas/sistem-percetakan/app/finishing"
 	"github.com/jihanlugas/sistem-percetakan/app/orderphase"
@@ -18,8 +21,6 @@ import (
 	"github.com/jihanlugas/sistem-percetakan/response"
 	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
-	"html/template"
-	"os"
 )
 
 type Usecase interface {
@@ -251,6 +252,7 @@ func (u usecase) AddTransaction(loginUser jwt.UserLogin, id string, req request.
 		Amount:      req.Amount,
 		Description: req.Description,
 		Type:        constant.TRANSACTION_TYPE_DEBIT,
+		PaymentType: req.PaymentType,
 		CreateBy:    loginUser.UserID,
 		UpdateBy:    loginUser.UserID,
 	}

@@ -1,9 +1,10 @@
 package model
 
 import (
+	"time"
+
 	"github.com/jihanlugas/sistem-percetakan/constant"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Photo struct {
@@ -192,6 +193,7 @@ type Transaction struct {
 	Name        string                   `gorm:"not null" json:"name"`
 	Description string                   `gorm:"not null" json:"description"`
 	Type        constant.TransactionType `gorm:"not null" json:"type"`
+	PaymentType constant.PaymentType     `gorm:"default:CASH" json:"paymentType"`
 	Amount      int64                    `gorm:"not null" json:"amount"`
 	CreateBy    string                   `gorm:"not null" json:"createBy"`
 	CreateDt    time.Time                `gorm:"not null" json:"createDt"`

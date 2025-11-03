@@ -2,6 +2,7 @@ package constant
 
 type RefTable string
 type TransactionType int64
+type PaymentType string
 
 const (
 	GENDER_MALE   = "MALE"
@@ -21,4 +22,7 @@ const (
 
 	TRANSACTION_TYPE_DEBIT  TransactionType = 1
 	TRANSACTION_TYPE_KREDIT TransactionType = -1
+
+	PAYMENT_TYPE_CASH     PaymentType = "CASH"
+	PAYMENT_TYPE_TRANSFER PaymentType = "TRANSFER"
 )

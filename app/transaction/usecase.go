@@ -3,6 +3,7 @@ package transaction
 import (
 	"errors"
 	"fmt"
+
 	"github.com/jihanlugas/sistem-percetakan/db"
 	"github.com/jihanlugas/sistem-percetakan/jwt"
 	"github.com/jihanlugas/sistem-percetakan/model"
@@ -111,6 +112,7 @@ func (u usecase) Update(loginUser jwt.UserLogin, id string, req request.UpdateTr
 	tTransaction.Description = req.Description
 	tTransaction.Amount = req.Amount
 	tTransaction.Type = req.Type
+	tTransaction.PaymentType = req.PaymentType
 	tTransaction.UpdateBy = loginUser.UserID
 	err = u.repository.Save(tx, tTransaction)
 	if err != nil {
