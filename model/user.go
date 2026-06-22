@@ -1,11 +1,10 @@
 package model
 
 import (
-	"fmt"
-	"github.com/jihanlugas/sistem-percetakan/config"
+	"time"
+
 	"github.com/jihanlugas/sistem-percetakan/utils"
 	"gorm.io/gorm"
-	"time"
 )
 
 func (m *User) BeforeCreate(tx *gorm.DB) (err error) {
@@ -32,7 +31,8 @@ func (m *User) BeforeUpdate(tx *gorm.DB) (err error) {
 
 func (m *UserView) AfterFind(tx *gorm.DB) (err error) {
 	if m.PhotoID != "" {
-		m.PhotoUrl = fmt.Sprintf("%s/%s", config.FileBaseUrl, m.PhotoUrl)
+		// m.PhotoUrl = fmt.Sprintf("%s/%s", config.FileBaseUrl, m.PhotoUrl)
+		m.PhotoUrl = utils.GetPhotoUrlById(m.PhotoID)
 	}
 	return
 }
